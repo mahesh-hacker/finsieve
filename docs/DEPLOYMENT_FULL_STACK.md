@@ -11,6 +11,7 @@
 1. Open [Supabase Dashboard](https://supabase.com/dashboard) → your project → **SQL Editor**.
 2. Copy the full contents of **`finsieve-backend/src/database/schema.sql`** and paste into the editor → **Run**.
 3. (Optional) If you had run an older schema before, also run **`finsieve-backend/src/database/supabase_fix_columns.sql`**.
+4. If you get **500 on login/register**, run **`finsieve-backend/src/database/migration_500_fix.sql`** in the SQL Editor (adds `email_verification_tokens` table and `revoked_at` on `refresh_tokens`).
 
 ### 2. Deploy backend on Railway
 
@@ -238,6 +239,21 @@ This means the backend could not decrypt the request (or the frontend could not 
 3. **Redeploy both after changing the key**
    - Change **ENCRYPTION_KEY** on Railway → redeploy backend.
    - Change **VITE_ENCRYPTION_KEY** on Vercel → redeploy frontend (env vars are baked in at build time).
+
+---
+
+## 500 Internal Server Error on login / signup
+
+Often caused by the database missing tables or columns the auth service expects:
+
+1. **Run the migration on Supabase**  
+   In Supabase → **SQL Editor**, run the contents of **`finsieve-backend/src/database/migration_500_fix.sql`**.  
+   This adds:
+   - **`revoked_at`** to `refresh_tokens`
+   - **`email_verification_tokens`** table (used for email verification on register)
+
+2. **user_tier**  
+   The schema allows only `'FREE'`, `'PREMIUM'`, `'ENTERPRISE'` (uppercase). The auth service was updated to insert `'FREE'` instead of `'free'`. If you have existing rows with `user_tier = 'free'`, the migration script updates them to `'FREE'`.
 
 ---
 

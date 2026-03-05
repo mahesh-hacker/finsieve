@@ -28,19 +28,28 @@ export const register = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Register controller error:", error);
+    console.error("Register controller error:", error?.message ?? error);
 
-    if (error.message === "Email already registered") {
+    if (error?.message === "Email already registered") {
       return res.status(409).json({
         success: false,
         message: "An account with this email already exists",
       });
     }
 
-    if (error.message === "Mobile number already registered") {
+    if (error?.message === "Mobile number already registered") {
       return res.status(409).json({
         success: false,
         message: "An account with this mobile number already exists",
+      });
+    }
+
+    // Database constraint / missing table (e.g. email_verification_tokens)
+    const code = error?.code || error?.constraint;
+    if (code === "23514" || (error?.message && error.message.includes("does not exist"))) {
+      return res.status(503).json({
+        success: false,
+        message: "Service temporarily unavailable. Please try again later.",
       });
     }
 
@@ -72,16 +81,16 @@ export const login = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Login controller error:", error);
+    console.error("Login controller error:", error?.message ?? error);
 
-    if (error.message === "Invalid credentials") {
+    if (error?.message === "Invalid credentials") {
       return res.status(401).json({
         success: false,
         message: "Invalid email/mobile number or password",
       });
     }
 
-    if (error.message === "Account has been deactivated") {
+    if (error?.message === "Account has been deactivated") {
       return res.status(403).json({
         success: false,
         message: "Your account has been deactivated. Please contact support.",

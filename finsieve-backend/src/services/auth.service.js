@@ -50,7 +50,7 @@ export const register = async ({
       `INSERT INTO users (email, password_hash, first_name, last_name, phone, user_tier)
        VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING id, email, first_name, last_name, phone, user_tier, is_email_verified, created_at`,
-      [email, passwordHash, firstName, lastName, phone || null, "free"],
+      [email, passwordHash, firstName, lastName, phone || null, "FREE"],
     );
 
     const user = result.rows[0];

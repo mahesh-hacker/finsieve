@@ -34,8 +34,21 @@ CREATE TABLE IF NOT EXISTS refresh_tokens (
     user_id UUID REFERENCES users(id) ON DELETE CASCADE,
     token VARCHAR(500) NOT NULL,
     expires_at TIMESTAMP NOT NULL,
+    revoked_at TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Email verification tokens (used by auth.service for verify email flow)
+CREATE TABLE IF NOT EXISTS email_verification_tokens (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    token VARCHAR(255) NOT NULL,
+    expires_at TIMESTAMP NOT NULL,
+    verified_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_email_verification_tokens_token ON email_verification_tokens(token);
+CREATE INDEX IF NOT EXISTS idx_email_verification_tokens_user_id ON email_verification_tokens(user_id);
 
 -- ============================================
 -- GLOBAL INDICES
