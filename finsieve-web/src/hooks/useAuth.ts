@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import authService from "../services/auth/authService";
-import { loginSuccess, logout } from "../store/slices/authSlice";
+import { loginSuccess, logout, setInitializing } from "../store/slices/authSlice";
 import { RootState } from "../store";
 
 /**
@@ -21,8 +21,6 @@ export const useAuth = () => {
 
       if (accessToken && refreshToken && !isAuthenticated) {
         try {
-          // Validate tokens by fetching current user
-          // This will automatically refresh the access token if expired
           const response = await authService.getCurrentUser();
 
           if (response.success && response.data) {
@@ -34,14 +32,14 @@ export const useAuth = () => {
               }),
             );
           } else {
-            // Invalid tokens, clear them
             dispatch(logout());
           }
-        } catch (error) {
-          console.error("Failed to initialize auth:", error);
-          // Clear invalid tokens
+        } catch {
           dispatch(logout());
         }
+      } else {
+        // No tokens — mark init done immediately so ProtectedRoute doesn't spin forever
+        dispatch(setInitializing(false));
       }
     };
 

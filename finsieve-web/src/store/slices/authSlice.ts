@@ -7,8 +7,13 @@ interface AuthState {
   refreshToken: string | null;
   user: User | null;
   loading: boolean;
+  initializing: boolean; // true until first auth check completes on app load
   error: string | null;
 }
+
+const hasStoredTokens = !!(
+  localStorage.getItem("accessToken") && localStorage.getItem("refreshToken")
+);
 
 const initialState: AuthState = {
   isAuthenticated: false,
@@ -16,6 +21,7 @@ const initialState: AuthState = {
   refreshToken: localStorage.getItem("refreshToken"),
   user: null,
   loading: false,
+  initializing: hasStoredTokens, // only show loading spinner if tokens exist to validate
   error: null,
 };
 
@@ -66,6 +72,7 @@ const authSlice = createSlice({
         },
       };
       state.loading = false;
+      state.initializing = false;
       state.error = null;
 
       // Store tokens in localStorage
@@ -77,12 +84,16 @@ const authSlice = createSlice({
       state.error = action.payload;
       state.isAuthenticated = false;
     },
+    setInitializing: (state, action: PayloadAction<boolean>) => {
+      state.initializing = action.payload;
+    },
     logout: (state) => {
       state.isAuthenticated = false;
       state.accessToken = null;
       state.refreshToken = null;
       state.user = null;
       state.loading = false;
+      state.initializing = false;
       state.error = null;
 
       // Clear localStorage
@@ -112,5 +123,6 @@ export const {
   logout,
   setUser,
   updateTokens,
+  setInitializing,
 } = authSlice.actions;
 export default authSlice.reducer;

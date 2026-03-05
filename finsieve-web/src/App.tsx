@@ -1,6 +1,8 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "./store";
+import { useAuth } from "./hooks/useAuth";
+import { Box, CircularProgress } from "@mui/material";
 
 // Layouts
 import MainLayout from "./layouts/common/MainLayout";
@@ -33,9 +35,20 @@ import Watchlists from "./pages/watchlist/Watchlists";
 import ProfileSettings from "./pages/dashboard/ProfileSettings";
 import News from "./pages/news/News";
 
-// Protected Route: redirects unauthenticated users to /login
+// Protected Route: waits for auth init, then redirects unauthenticated users to /login
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const { isAuthenticated, initializing } = useSelector(
+    (state: RootState) => state.auth,
+  );
+
+  if (initializing) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
@@ -43,6 +56,9 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 function App() {
+  // Initialize auth from stored tokens on every app load
+  useAuth();
+
   return (
     <Routes>
       {/* ── Landing & About (standalone, no app shell) ── */}
