@@ -19,8 +19,9 @@ export const useAuth = () => {
       const accessToken = localStorage.getItem("accessToken");
       const refreshToken = localStorage.getItem("refreshToken");
 
-      if (accessToken && refreshToken && !isAuthenticated) {
+      if (accessToken && refreshToken && !user) {
         try {
+          // Background validation — page is already shown (optimistic auth)
           const response = await authService.getCurrentUser();
 
           if (response.success && response.data) {
@@ -32,19 +33,22 @@ export const useAuth = () => {
               }),
             );
           } else {
+            // Token rejected by server — log out
             dispatch(logout());
           }
         } catch {
-          dispatch(logout());
+          // Network error or 401 — log out only if server explicitly rejected
+          // (don't log out on transient network issues to avoid false logouts)
+          const freshToken = localStorage.getItem("accessToken");
+          if (!freshToken) dispatch(logout());
         }
       } else {
-        // No tokens — mark init done immediately so ProtectedRoute doesn't spin forever
         dispatch(setInitializing(false));
       }
     };
 
     initializeAuth();
-  }, [dispatch, isAuthenticated]);
+  }, [dispatch]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return { isAuthenticated, user };
 };

@@ -11,17 +11,18 @@ interface AuthState {
   error: string | null;
 }
 
-const hasStoredTokens = !!(
-  localStorage.getItem("accessToken") && localStorage.getItem("refreshToken")
-);
+const storedAccessToken = localStorage.getItem("accessToken");
+const storedRefreshToken = localStorage.getItem("refreshToken");
+const hasStoredTokens = !!(storedAccessToken && storedRefreshToken);
 
 const initialState: AuthState = {
-  isAuthenticated: false,
-  accessToken: localStorage.getItem("accessToken"),
-  refreshToken: localStorage.getItem("refreshToken"),
+  // Optimistic auth: trust stored tokens immediately, /me validates in background
+  isAuthenticated: hasStoredTokens,
+  accessToken: storedAccessToken,
+  refreshToken: storedRefreshToken,
   user: null,
   loading: false,
-  initializing: hasStoredTokens, // only show loading spinner if tokens exist to validate
+  initializing: false, // no spinner needed — page shows immediately
   error: null,
 };
 
