@@ -193,8 +193,15 @@ After this, the site will be fully functional with database and API in the cloud
 
 ## Railway: "Deployment failed during build process"
 
-- **Root Directory must be `finsieve-backend`**  
-  Railway builds from the repo root; the app lives in `finsieve-backend`. In the service **Settings** → **Root Directory**, set **`finsieve-backend`** and redeploy.
-- **Node version:** Backend `package.json` has `"engines": { "node": ">=18.0.0" }`. Railway will use Node 18+.
-- **Build / Start:** Build = `npm install`, Start = `npm start`. If you set a custom "Build Command", use `npm install` or leave it blank. Do not use `npm run build` unless you need it.
-- **Logs:** In Railway, open the failed deployment → **View logs** and check the exact error (e.g. missing dependency, wrong path, or env var).
+1. **Root Directory must be `finsieve-backend`**  
+   **Settings** → **Root Directory** → set **`finsieve-backend`** (no leading slash). Save and redeploy.
+
+2. **Use Docker build (recommended)**  
+   The repo has **`finsieve-backend/Dockerfile`**. Railway will use it when Root Directory is `finsieve-backend`.  
+   If Railway used Nixpacks before: **Settings** → **Build** → ensure no custom builder override, or set **Dockerfile path** to `Dockerfile` (relative to root directory).
+
+3. **Check the actual error**  
+   Open the **failed deployment** → **View logs**. The last 20–30 lines usually show the failure (e.g. `npm install` error, missing file, or crash on start). Fix that first.
+
+4. **Env vars at deploy time**  
+   Add **Variables** (e.g. `DATABASE_URL`, `JWT_SECRET`, `JWT_REFRESH_SECRET`, `ENCRYPTION_KEY`, `ALLOWED_ORIGINS`, `FRONTEND_URL`) **before** the first deploy. The app may crash on start if required vars are missing.
