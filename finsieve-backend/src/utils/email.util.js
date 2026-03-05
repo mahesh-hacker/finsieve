@@ -19,6 +19,8 @@ export const sendEmail = async ({ to, subject, html, text }) => {
   }
 
   const senderEmail = process.env.EMAIL_FROM || process.env.EMAIL_USER;
+  const key = process.env.BREVO_API_KEY;
+  console.log(`[Email] key length=${key.length} prefix=${key.slice(0, 12)}...`);
 
   try {
     const response = await axios.post(
