@@ -1,5 +1,5 @@
-# Finsieve backend - Railway / Docker deploy
-FROM node:20-alpine
+# Finsieve backend - Railway / Docker deploy (Node 22 required by yahoo-finance2)
+FROM node:22-alpine
 
 WORKDIR /app
 

@@ -1,6 +1,6 @@
-# Force Nixpacks/Railpack to treat this as Node and not look for start.sh
+# Force Nixpacks/Railpack to treat this as Node (22 required by yahoo-finance2)
 [phases.setup]
-nixPkgs = ["nodejs_20"]
+nixPkgs = ["nodejs_22"]
 
 [phases.install]
 cmds = ["npm install --omit=dev"]

@@ -18,17 +18,19 @@
 2. **Critical:** Select the new service → **Settings** → **Root Directory** → set to **`finsieve-backend`** → Save.  
    If Root Directory is wrong or empty, the build fails (no `package.json` at repo root).
 3. **Build & Deploy:** Leave **Build Command** empty (or `npm install`); **Start Command** = `npm start`. Railway will use `finsieve-backend/railway.json` and `package.json` from the root directory above.
-3. **Variables** tab → add (use your own JWT secrets in production):
+3. **Variables** tab → add (required; app crashes on start if JWT_* are missing):
 
 | Variable | Value |
 |----------|--------|
 | `NODE_ENV` | `production` |
 | `DATABASE_URL` | `postgresql://postgres:_%40Mahesh9702@db.grikvekkbfhjlqwdxkgu.supabase.co:5432/postgres` |
-| `JWT_SECRET` | long random string (e.g. 64 chars) |
-| `JWT_REFRESH_SECRET` | another long random string |
+| `JWT_SECRET` | **Required.** Any string **at least 32 characters** (e.g. generate: `openssl rand -hex 32`) |
+| `JWT_REFRESH_SECRET` | **Required.** Another string **at least 32 characters** (different from JWT_SECRET) |
 | `ENCRYPTION_KEY` | `ff0d0d28eb6d89a4a2c1efd135c3ed7f237e35285a9f80efcbe14656a63769dc` (must match frontend) |
 | `ALLOWED_ORIGINS` | `https://finsieve-tau.vercel.app` |
 | `FRONTEND_URL` | `https://finsieve-tau.vercel.app` |
+
+If you see **"FATAL: JWT_SECRET must be set and at least 32 characters long"**, add both `JWT_SECRET` and `JWT_REFRESH_SECRET` in Railway → service → **Variables**, each at least 32 characters, then redeploy.
 
 4. **Settings** → **Networking** → **Generate domain** → note the URL (e.g. `https://finsieve-backend-production-xxxx.up.railway.app`).
 
@@ -206,4 +208,4 @@ After this, the site will be fully functional with database and API in the cloud
    Open the **failed deployment** → **View logs**. The last 20–30 lines usually show the failure (e.g. `npm install` error, missing file, or crash on start). Fix that first.
 
 4. **Env vars at deploy time**  
-   Add **Variables** (e.g. `DATABASE_URL`, `JWT_SECRET`, `JWT_REFRESH_SECRET`, `ENCRYPTION_KEY`, `ALLOWED_ORIGINS`, `FRONTEND_URL`) **before** the first deploy. The app may crash on start if required vars are missing.
+   Add **Variables** (e.g. `DATABASE_URL`, `JWT_SECRET`, `JWT_REFRESH_SECRET`, `ENCRYPTION_KEY`, `ALLOWED_ORIGINS`, `FRONTEND_URL`) **before** the first deploy. The app **crashes on start** if `JWT_SECRET` or `JWT_REFRESH_SECRET` is missing or shorter than 32 characters. Backend requires **Node 22** (yahoo-finance2); Dockerfile and nixpacks.toml are set to Node 22.
