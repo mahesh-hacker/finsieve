@@ -24,7 +24,11 @@ async function getAesKey(): Promise<CryptoKey> {
 
   _keyPromise = (async () => {
     if (!RAW_KEY_STRING) {
-      throw new Error("VITE_ENCRYPTION_KEY is not set");
+      throw new Error(
+        "VITE_ENCRYPTION_KEY is not set. " +
+        "Add it in Vercel → Project → Settings → Environment Variables (same value as backend ENCRYPTION_KEY), then redeploy. " +
+        "Locally: add VITE_ENCRYPTION_KEY to finsieve-web/.env"
+      );
     }
 
     const encoder   = new TextEncoder();
