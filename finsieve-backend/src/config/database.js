@@ -5,21 +5,33 @@ dotenv.config();
 
 const { Pool } = pg;
 
-// Database configuration
-const dbConfig = {
-  host: process.env.DB_HOST || "localhost",
-  port: parseInt(process.env.DB_PORT) || 5432,
-  database: process.env.DB_NAME || "finsieve_db",
-  user: process.env.DB_USER || "finsieve_user",
-  password: process.env.DB_PASSWORD,
-  max: 50, // Maximum number of clients in the pool (increased for schedulers)
-  min: 10, // Minimum number of clients in the pool
-  idleTimeoutMillis: 60000, // Close idle clients after 60 seconds
-  connectionTimeoutMillis: 10000, // Return an error after 10 seconds if connection could not be established
-  acquireTimeoutMillis: 30000, // Wait up to 30 seconds for a connection from the pool
-  statement_timeout: 30000, // Cancel queries after 30 seconds
-  query_timeout: 30000, // Timeout for query execution
-};
+// Supabase and other cloud Postgres require SSL
+const useSsl = process.env.DATABASE_URL || process.env.DB_SSL === "true";
+
+const dbConfig = process.env.DATABASE_URL
+  ? {
+      connectionString: process.env.DATABASE_URL,
+      ssl: useSsl ? { rejectUnauthorized: false } : false,
+      max: 50,
+      min: 10,
+      idleTimeoutMillis: 60000,
+      connectionTimeoutMillis: 10000,
+      statement_timeout: 30000,
+    }
+  : {
+      host: process.env.DB_HOST || "localhost",
+      port: parseInt(process.env.DB_PORT) || 5432,
+      database: process.env.DB_NAME || "finsieve_db",
+      user: process.env.DB_USER || "finsieve_user",
+      password: process.env.DB_PASSWORD,
+      ssl: useSsl ? { rejectUnauthorized: false } : false,
+      max: 50,
+      min: 10,
+      idleTimeoutMillis: 60000,
+      connectionTimeoutMillis: 10000,
+      acquireTimeoutMillis: 30000,
+      statement_timeout: 30000,
+    };
 
 // Create connection pool
 const pool = new Pool(dbConfig);

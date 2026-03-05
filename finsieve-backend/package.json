@@ -4,9 +4,13 @@
     "description": "Finsieve Investment Intelligence Platform - Backend API",
     "main": "src/server.js",
     "type": "module",
+    "engines": {
+        "node": ">=18.0.0"
+    },
     "scripts": {
         "dev": "nodemon src/server.js",
         "start": "node src/server.js",
+        "build": "echo 'No build step'",
         "db:migrate": "node src/database/migrations/migrate.js",
         "db:seed": "node src/database/seeds/seed.js",
         "db:reset": "node src/database/migrations/reset.js"
