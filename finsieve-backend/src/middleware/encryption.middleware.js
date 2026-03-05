@@ -95,18 +95,21 @@ export const decryptRequest = (req, res, next) => {
 
 /**
  * Encrypt outgoing response when client sent `x-encrypted: true`.
+ * Skip encryption for error responses (4xx/5xx) so clients and DevTools can read error message and detail.
  */
 export const encryptResponse = (req, res, next) => {
   const originalJson = res.json.bind(res);
 
   res.json = function (data) {
-    if (req.headers["x-encrypted"] === "true") {
+    const status = res.statusCode;
+    const isSuccess = status >= 200 && status < 300;
+    if (req.headers["x-encrypted"] === "true" && isSuccess) {
       try {
         const encrypted = encryptData(data);
         res.setHeader("X-Encrypted", "true");
         return originalJson({ encrypted });
       } catch (_err) {
-        // Should never happen; fall through to plain JSON
+        // Fall through to plain JSON
       }
     }
     return originalJson(data);
