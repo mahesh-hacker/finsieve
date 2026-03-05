@@ -160,6 +160,7 @@ import comparisonRoutes from "./routes/comparison.routes.js";
 import watchlistRoutes from "./routes/watchlist.routes.js";
 import brokerRoutes from "./routes/broker.routes.js";
 import chatbotRoutes from "./routes/chatbot.routes.js";
+import assetsRoutes from "./routes/assets.routes.js";
 
 // Use routes
 app.use("/api/v1/auth", authLimiter, authRoutes);
@@ -172,6 +173,7 @@ app.use("/api/v1/commodities", commoditiesRoutes);
 app.use("/api/v1/bonds", bondsRoutes);
 app.use("/api/v1/mutual-funds", mutualFundsRoutes);
 app.use("/api/v1/screening", screeningRoutes);
+app.use("/api/v1/assets", assetsRoutes);
 app.use("/api/v1/comparison", comparisonRoutes);
 app.use("/api/v1/watchlists", watchlistRoutes);
 app.use("/api/v1/broker", brokerRoutes);

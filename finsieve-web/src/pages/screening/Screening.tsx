@@ -37,6 +37,7 @@ import screeningService, {
   type AssetClassInfo,
   type QuickScreen,
 } from "../../services/screening/screeningService";
+import MultiAssetTabs from "../../components/screening/MultiAssetTabs";
 import toast from "react-hot-toast";
 
 const ASSET_CLASS_COLORS: Record<string, string> = {
@@ -46,9 +47,17 @@ const ASSET_CLASS_COLORS: Record<string, string> = {
   COMMODITY: "#ef4444",
   BOND: "#6366f1",
   INDEX: "#8b5cf6",
+  ETF: "#0ea5e9",
+  SIF: "#8b5cf6",
+  PMS: "#6366f1",
+  AIF: "#059669",
 };
 
-const Screening = () => {
+interface ScreeningProps {
+  defaultAssetClass?: string;
+}
+
+const Screening = ({ defaultAssetClass }: ScreeningProps) => {
   const theme = useTheme();
   const [assetClasses, setAssetClasses] = useState<AssetClassInfo[]>([]);
   const [selectedAssetClass, setSelectedAssetClass] = useState("");
@@ -76,7 +85,12 @@ const Screening = () => {
         ]);
         const acData = acRes as { data?: AssetClassInfo[] };
         const qsData = qsRes as { data?: QuickScreen[] };
-        if (acData?.data) setAssetClasses(acData.data);
+        if (acData?.data) {
+          setAssetClasses(acData.data);
+          if (defaultAssetClass && acData.data.some((ac: AssetClassInfo) => ac.key === defaultAssetClass)) {
+            setSelectedAssetClass(defaultAssetClass);
+          }
+        }
         if (qsData?.data) setQuickScreens(qsData.data);
       } catch (error) {
         console.error("Error loading screening config:", error);
@@ -85,7 +99,7 @@ const Screening = () => {
       }
     };
     loadInitial();
-  }, []);
+  }, [defaultAssetClass]);
 
   // Load screening params when asset class changes
   useEffect(() => {
@@ -263,6 +277,49 @@ const Screening = () => {
           { key: "country", label: "Country" },
           { key: "exchange", label: "Exchange" },
         ];
+      case "ETF":
+        return [
+          { key: "symbol", label: "Symbol" },
+          { key: "name", label: "Name" },
+          { key: "category", label: "Category" },
+          { key: "current_value", label: "Price" },
+          { key: "change_percent", label: "Change %" },
+          { key: "aum_cr", label: "AUM (₹Cr)" },
+          { key: "ter", label: "TER %" },
+          { key: "return_1y", label: "1Y %" },
+          { key: "return_3y", label: "3Y %" },
+          { key: "tracking_error", label: "Tracking Err %" },
+        ];
+      case "SIF":
+        return [
+          { key: "name", label: "Fund" },
+          { key: "strategy_type", label: "Strategy" },
+          { key: "risk_band", label: "Risk" },
+          { key: "aum_cr", label: "AUM (₹Cr)" },
+          { key: "alpha_3y", label: "Alpha 3Y" },
+          { key: "max_drawdown", label: "Max DD %" },
+          { key: "redemption_days", label: "Redemption Days" },
+        ];
+      case "PMS":
+        return [
+          { key: "name", label: "PMS" },
+          { key: "aum_cr", label: "AUM (₹Cr)" },
+          { key: "alpha_3y", label: "Alpha 3Y" },
+          { key: "sharpe_ratio", label: "Sharpe" },
+          { key: "max_drawdown", label: "Max DD %" },
+          { key: "irr_inception", label: "IRR %" },
+          { key: "client_count", label: "Clients" },
+        ];
+      case "AIF":
+        return [
+          { key: "name", label: "Fund" },
+          { key: "category", label: "Category" },
+          { key: "strategy", label: "Strategy" },
+          { key: "vintage_year", label: "Vintage" },
+          { key: "irr_target", label: "IRR Target %" },
+          { key: "lock_in_years", label: "Lock-in" },
+          { key: "min_investment_cr", label: "Min (₹Cr)" },
+        ];
       default:
         return [
           { key: "symbol", label: "Symbol" },
@@ -285,6 +342,9 @@ const Screening = () => {
     "country",
     "fund_house",
     "scheme_category",
+    "strategy_type",
+    "risk_band",
+    "strategy",
   ]);
 
   if (initialLoading) {
@@ -308,6 +368,7 @@ const Screening = () => {
 
   return (
     <Box sx={{ pb: 4 }}>
+      <MultiAssetTabs />
       {/* Header */}
       <Box sx={{ mb: 4 }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 1 }}>
@@ -317,8 +378,7 @@ const Screening = () => {
           </Typography>
         </Box>
         <Typography variant="body1" color="text.secondary">
-          Filter across 6 asset classes with 50+ parameters — the screener that
-          kills Screener.in, TradingView & Morningstar combined
+          Filter across 10 asset classes — Equities, Crypto, MF, ETF, SIF, PMS, AIF & more
         </Typography>
       </Box>
 

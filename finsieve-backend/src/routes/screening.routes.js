@@ -32,6 +32,10 @@ router.get("/params/:assetClass", (req, res) => {
           "BOND",
           "MUTUAL_FUND",
           "INDEX",
+          "ETF",
+          "SIF",
+          "PMS",
+          "AIF",
         ],
       });
     }
@@ -63,13 +67,16 @@ router.post("/run", async (req, res) => {
         .json({ success: false, message: "assetClass is required" });
     }
 
+    const safeLimit = Math.min(500, Math.max(1, parseInt(limit, 10) || 100));
+    const safeOffset = Math.min(10000, Math.max(0, parseInt(offset, 10) || 0));
+
     const result = await screeningService.screen(
       assetClass.toUpperCase(),
-      filters,
+      Array.isArray(filters) ? filters : [],
       sortBy,
       sortOrder,
-      parseInt(limit),
-      parseInt(offset),
+      safeLimit,
+      safeOffset,
     );
 
     res.json({ success: true, ...result });
@@ -85,13 +92,16 @@ router.get("/run/:assetClass", async (req, res) => {
     const { assetClass } = req.params;
     const { sortBy, sortOrder = "desc", limit = 50, offset = 0 } = req.query;
 
+    const safeLimit = Math.min(500, Math.max(1, parseInt(limit, 10) || 50));
+    const safeOffset = Math.min(10000, Math.max(0, parseInt(offset, 10) || 0));
+
     const result = await screeningService.screen(
       assetClass.toUpperCase(),
       [],
       sortBy,
       sortOrder,
-      parseInt(limit),
-      parseInt(offset),
+      safeLimit,
+      safeOffset,
     );
 
     res.json({ success: true, ...result });
@@ -150,44 +160,71 @@ router.get("/asset-classes", (req, res) => {
   res.json({
     success: true,
     data: [
-      {
-        key: "US_EQUITY",
-        label: "US Equities",
-        icon: "📈",
-        description: "NYSE/NASDAQ stocks",
-      },
-      {
-        key: "CRYPTO",
-        label: "Cryptocurrency",
-        icon: "₿",
-        description: "Top 100 by market cap",
-      },
-      {
-        key: "MUTUAL_FUND",
-        label: "Mutual Funds",
-        icon: "🏛️",
-        description: "Indian AMFI registered schemes",
-      },
-      {
-        key: "COMMODITY",
-        label: "Commodities",
-        icon: "🥇",
-        description: "Gold, Oil, Agriculture & more",
-      },
-      {
-        key: "BOND",
-        label: "Bonds & Treasury",
-        icon: "📋",
-        description: "US Treasury yields",
-      },
-      {
-        key: "INDEX",
-        label: "Global Indices",
-        icon: "🌍",
-        description: "20+ global market indices",
-      },
+      { key: "US_EQUITY", label: "US Equities", icon: "📈", description: "NYSE/NASDAQ stocks" },
+      { key: "CRYPTO", label: "Cryptocurrency", icon: "₿", description: "Top 100 by market cap" },
+      { key: "MUTUAL_FUND", label: "Mutual Funds", icon: "🏛️", description: "Indian AMFI registered schemes" },
+      { key: "COMMODITY", label: "Commodities", icon: "🥇", description: "Gold, Oil, Agriculture & more" },
+      { key: "BOND", label: "Bonds & Treasury", icon: "📋", description: "US Treasury yields" },
+      { key: "INDEX", label: "Global Indices", icon: "🌍", description: "20+ global market indices" },
+      { key: "ETF", label: "ETFs", icon: "📊", description: "Indian ETFs — NSE/BSE, AUM, TER, returns" },
+      { key: "SIF", label: "SIF", icon: "🎯", description: "Specialized Investment Funds (₹10L+)" },
+      { key: "PMS", label: "PMS", icon: "💼", description: "Portfolio Management Services (₹50L+)" },
+      { key: "AIF", label: "AIF", icon: "🏦", description: "Alternative Investment Funds (₹1Cr+)" },
     ],
   });
+});
+
+// ─── ASSET-SPECIFIC SCREENING (convenience endpoints) ───────
+router.post("/etfs", async (req, res) => {
+  try {
+    const { filters = [], sortBy, sortOrder = "desc", limit = 100, offset = 0 } = req.body;
+    const safeLimit = Math.min(500, Math.max(1, parseInt(limit, 10) || 100));
+    const safeOffset = Math.min(10000, Math.max(0, parseInt(offset, 10) || 0));
+    const result = await screeningService.screen("ETF", Array.isArray(filters) ? filters : [], sortBy, sortOrder, safeLimit, safeOffset);
+    res.json({ success: true, ...result });
+  } catch (e) {
+    console.error("❌ ETF screening error:", e.message);
+    res.status(500).json({ success: false, message: "ETF screening failed" });
+  }
+});
+
+router.post("/sif", async (req, res) => {
+  try {
+    const { filters = [], sortBy, sortOrder = "desc", limit = 100, offset = 0 } = req.body;
+    const safeLimit = Math.min(500, Math.max(1, parseInt(limit, 10) || 100));
+    const safeOffset = Math.min(10000, Math.max(0, parseInt(offset, 10) || 0));
+    const result = await screeningService.screen("SIF", Array.isArray(filters) ? filters : [], sortBy, sortOrder, safeLimit, safeOffset);
+    res.json({ success: true, ...result });
+  } catch (e) {
+    console.error("❌ SIF screening error:", e.message);
+    res.status(500).json({ success: false, message: "SIF screening failed" });
+  }
+});
+
+router.post("/pms", async (req, res) => {
+  try {
+    const { filters = [], sortBy, sortOrder = "desc", limit = 100, offset = 0 } = req.body;
+    const safeLimit = Math.min(500, Math.max(1, parseInt(limit, 10) || 100));
+    const safeOffset = Math.min(10000, Math.max(0, parseInt(offset, 10) || 0));
+    const result = await screeningService.screen("PMS", Array.isArray(filters) ? filters : [], sortBy, sortOrder, safeLimit, safeOffset);
+    res.json({ success: true, ...result });
+  } catch (e) {
+    console.error("❌ PMS screening error:", e.message);
+    res.status(500).json({ success: false, message: "PMS screening failed" });
+  }
+});
+
+router.post("/aif", async (req, res) => {
+  try {
+    const { filters = [], sortBy, sortOrder = "desc", limit = 100, offset = 0 } = req.body;
+    const safeLimit = Math.min(500, Math.max(1, parseInt(limit, 10) || 100));
+    const safeOffset = Math.min(10000, Math.max(0, parseInt(offset, 10) || 0));
+    const result = await screeningService.screen("AIF", Array.isArray(filters) ? filters : [], sortBy, sortOrder, safeLimit, safeOffset);
+    res.json({ success: true, ...result });
+  } catch (e) {
+    console.error("❌ AIF screening error:", e.message);
+    res.status(500).json({ success: false, message: "AIF screening failed" });
+  }
 });
 
 export default router;

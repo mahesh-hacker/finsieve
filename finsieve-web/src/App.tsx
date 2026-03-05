@@ -30,6 +30,10 @@ import Commodities from "./pages/commodities/Commodities";
 import Bonds from "./pages/bonds/Bonds";
 import Cryptocurrency from "./pages/crypto/Cryptocurrency";
 import Screening from "./pages/screening/Screening";
+import EtfScreener from "./components/screening/EtfScreener";
+import SifScreener from "./components/screening/SifScreener";
+import PmsScreener from "./components/screening/PmsScreener";
+import AifScreener from "./components/screening/AifScreener";
 import Comparison from "./pages/comparison/Comparison";
 import Watchlists from "./pages/watchlist/Watchlists";
 import ProfileSettings from "./pages/dashboard/ProfileSettings";
@@ -97,6 +101,10 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/screening/etf" element={<ProtectedRoute><EtfScreener /></ProtectedRoute>} />
+        <Route path="/screening/sif" element={<ProtectedRoute><SifScreener /></ProtectedRoute>} />
+        <Route path="/screening/pms" element={<ProtectedRoute><PmsScreener /></ProtectedRoute>} />
+        <Route path="/screening/aif" element={<ProtectedRoute><AifScreener /></ProtectedRoute>} />
         <Route
           path="/comparison"
           element={
