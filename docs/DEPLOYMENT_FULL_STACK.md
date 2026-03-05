@@ -194,7 +194,9 @@ After this, the site will be fully functional with database and API in the cloud
 ## Railway: "Deployment failed during build process"
 
 1. **Root Directory must be `finsieve-backend`**  
-   **Settings** → **Root Directory** → set **`finsieve-backend`** (no leading slash). Save and redeploy.
+   Your build logs show Railpack analyzing the **repo root** (docs/, finsieve-backend/, finsieve-web/) — so the service is **not** using the backend folder.  
+   In Railway: open your **service** (e.g. "finsieve" or "dependable-peace") → **Settings** → find **"Root Directory"** or **"Source"** / **"Watch Paths"** → set **`finsieve-backend`** (no slash in front). Save and trigger a **Redeploy**.  
+   After this, the build should see only `finsieve-backend/` (package.json, src/, etc.) and "Script start.sh not found" / "could not determine how to build" will go away.
 
 2. **Use Docker build (recommended)**  
    The repo has **`finsieve-backend/Dockerfile`**. Railway will use it when Root Directory is `finsieve-backend`.  

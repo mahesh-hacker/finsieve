@@ -1,0 +1,9 @@
+# Force Nixpacks/Railpack to treat this as Node and not look for start.sh
+[phases.setup]
+nixPkgs = ["nodejs_20"]
+
+[phases.install]
+cmds = ["npm install --omit=dev"]
+
+[start]
+cmd = "node src/server.js"
