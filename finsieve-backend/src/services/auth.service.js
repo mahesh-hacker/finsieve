@@ -240,11 +240,8 @@ export const refreshAccessToken = async (refreshToken) => {
 
     // Revoke old refresh token
     await query(
-      `UPDATE refresh_tokens 
-       SET revoked_at = CURRENT_TIMESTAMP,
-           replaced_by = (SELECT id FROM refresh_tokens WHERE token = $1)
-       WHERE token = $2`,
-      [tokens.refreshToken, refreshToken],
+      `UPDATE refresh_tokens SET revoked_at = CURRENT_TIMESTAMP WHERE token = $1`,
+      [refreshToken],
     );
 
     return tokens;

@@ -84,12 +84,14 @@ export const register = async (req, res) => {
       });
     }
 
-    // Return actual error in response (include first underlying error if AggregateError)
-    const detail = error?.errors?.length ? error.errors.map((e) => e?.message || String(e)).join("; ") : msg;
+    // In development expose details; in production never leak internals
+    const detail = process.env.NODE_ENV !== "production"
+      ? (error?.errors?.length ? error.errors.map((e) => e?.message || String(e)).join("; ") : msg)
+      : undefined;
     return res.status(500).json({
       success: false,
       message: "Registration failed. Please try again.",
-      detail,
+      ...(detail && { detail }),
     });
   }
 };
