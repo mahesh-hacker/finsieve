@@ -28,7 +28,9 @@ export const register = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Register controller error:", error?.message ?? error);
+    const msg = error?.message || String(error);
+    const code = error?.code;
+    console.error("Register controller error:", msg, code ? `[${code}]` : "");
 
     if (error?.message === "Email already registered") {
       return res.status(409).json({
@@ -44,18 +46,47 @@ export const register = async (req, res) => {
       });
     }
 
-    // Database constraint / missing table (e.g. email_verification_tokens)
-    const code = error?.code || error?.constraint;
-    if (code === "23514" || (error?.message && error.message.includes("does not exist"))) {
-      return res.status(503).json({
+    // PostgreSQL: unique violation (email or phone)
+    if (code === "23505") {
+      const constraint = error?.constraint || "";
+      if (constraint.includes("email")) {
+        return res.status(409).json({ success: false, message: "An account with this email already exists" });
+      }
+      if (constraint.includes("phone")) {
+        return res.status(409).json({ success: false, message: "An account with this mobile number already exists" });
+      }
+    }
+
+    // PostgreSQL: not null violation
+    if (code === "23502") {
+      return res.status(400).json({
         success: false,
-        message: "Service temporarily unavailable. Please try again later.",
+        message: "Missing required field. Please check your registration data.",
       });
     }
 
-    res.status(500).json({
+    // PostgreSQL: check constraint (e.g. user_tier)
+    if (code === "23514") {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid data. Please check your registration data.",
+      });
+    }
+
+    // Missing table / relation does not exist
+    if (code === "42P01" || (msg && msg.includes("does not exist"))) {
+      return res.status(503).json({
+        success: false,
+        message: "Service temporarily unavailable. Run migration_500_fix.sql on your database.",
+        detail: process.env.NODE_ENV !== "production" ? msg : undefined,
+      });
+    }
+
+    // Return actual error in response so you can see it (e.g. in Network tab); safe for API consumers
+    return res.status(500).json({
       success: false,
       message: "Registration failed. Please try again.",
+      detail: msg,
     });
   }
 };

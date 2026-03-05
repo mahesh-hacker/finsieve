@@ -1,6 +1,9 @@
 -- Run this on Supabase (SQL Editor) if you already ran the original schema and get 500 on login/register
 -- Fixes: user_tier case, missing email_verification_tokens table, missing revoked_at on refresh_tokens
 
+-- 0. Ensure UUID extension exists (required for email_verification_tokens id)
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 -- 1. Add revoked_at to refresh_tokens if missing
 ALTER TABLE refresh_tokens ADD COLUMN IF NOT EXISTS revoked_at TIMESTAMP;
 
