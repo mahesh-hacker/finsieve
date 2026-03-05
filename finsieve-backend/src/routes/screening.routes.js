@@ -7,6 +7,7 @@
 import express from "express";
 import screeningService from "../services/screening.service.js";
 import { authenticate } from "../middleware/auth.middleware.js";
+import { decryptRequest } from "../middleware/encryption.middleware.js";
 
 const router = express.Router();
 
@@ -50,7 +51,7 @@ router.get("/params/:assetClass", (req, res) => {
 });
 
 // ─── RUN SCREENING ─────────────────────────────────────────
-router.post("/run", async (req, res) => {
+router.post("/run", decryptRequest, async (req, res) => {
   try {
     const {
       assetClass,
@@ -175,7 +176,7 @@ router.get("/asset-classes", (req, res) => {
 });
 
 // ─── ASSET-SPECIFIC SCREENING (convenience endpoints) ───────
-router.post("/etfs", async (req, res) => {
+router.post("/etfs", decryptRequest, async (req, res) => {
   try {
     const { filters = [], sortBy, sortOrder = "desc", limit = 100, offset = 0 } = req.body;
     const safeLimit = Math.min(500, Math.max(1, parseInt(limit, 10) || 100));
@@ -188,7 +189,7 @@ router.post("/etfs", async (req, res) => {
   }
 });
 
-router.post("/sif", async (req, res) => {
+router.post("/sif", decryptRequest, async (req, res) => {
   try {
     const { filters = [], sortBy, sortOrder = "desc", limit = 100, offset = 0 } = req.body;
     const safeLimit = Math.min(500, Math.max(1, parseInt(limit, 10) || 100));
@@ -201,7 +202,7 @@ router.post("/sif", async (req, res) => {
   }
 });
 
-router.post("/pms", async (req, res) => {
+router.post("/pms", decryptRequest, async (req, res) => {
   try {
     const { filters = [], sortBy, sortOrder = "desc", limit = 100, offset = 0 } = req.body;
     const safeLimit = Math.min(500, Math.max(1, parseInt(limit, 10) || 100));
@@ -214,7 +215,7 @@ router.post("/pms", async (req, res) => {
   }
 });
 
-router.post("/aif", async (req, res) => {
+router.post("/aif", decryptRequest, async (req, res) => {
   try {
     const { filters = [], sortBy, sortOrder = "desc", limit = 100, offset = 0 } = req.body;
     const safeLimit = Math.min(500, Math.max(1, parseInt(limit, 10) || 100));

@@ -33,7 +33,7 @@ export const generateAccessToken = (userId, email) => {
       type: "access",
     },
     JWT_SECRET,
-    { expiresIn: JWT_ACCESS_EXPIRY },
+    { expiresIn: JWT_ACCESS_EXPIRY, algorithm: "HS256" },
   );
 };
 
@@ -48,7 +48,7 @@ export const generateRefreshToken = (userId, email) => {
       type: "refresh",
     },
     JWT_REFRESH_SECRET,
-    { expiresIn: JWT_REFRESH_EXPIRY },
+    { expiresIn: JWT_REFRESH_EXPIRY, algorithm: "HS256" },
   );
 };
 
@@ -71,7 +71,7 @@ export const generateTokens = (userId, email) => {
  */
 export const verifyAccessToken = (token) => {
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
+    const decoded = jwt.verify(token, JWT_SECRET, { algorithms: ["HS256"] });
     if (decoded.type !== "access") {
       throw new Error("Invalid token type");
     }
@@ -86,7 +86,7 @@ export const verifyAccessToken = (token) => {
  */
 export const verifyRefreshToken = (token) => {
   try {
-    const decoded = jwt.verify(token, JWT_REFRESH_SECRET);
+    const decoded = jwt.verify(token, JWT_REFRESH_SECRET, { algorithms: ["HS256"] });
     if (decoded.type !== "refresh") {
       throw new Error("Invalid token type");
     }

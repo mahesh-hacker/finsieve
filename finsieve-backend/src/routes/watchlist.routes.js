@@ -6,6 +6,7 @@
 import express from "express";
 import watchlistService from "../services/watchlist.service.js";
 import { authenticate } from "../middleware/auth.middleware.js";
+import { decryptRequest } from "../middleware/encryption.middleware.js";
 
 const router = express.Router();
 
@@ -26,7 +27,7 @@ router.get("/", async (req, res) => {
 });
 
 // ─── CREATE WATCHLIST ──────────────────────────────────────
-router.post("/", async (req, res) => {
+router.post("/", decryptRequest, async (req, res) => {
   try {
     const watchlist = await watchlistService.createWatchlist(
       req.user.id,
@@ -95,7 +96,7 @@ router.delete("/:watchlistId", async (req, res) => {
 });
 
 // ─── ADD ITEM TO WATCHLIST ─────────────────────────────────
-router.post("/:watchlistId/items", async (req, res) => {
+router.post("/:watchlistId/items", decryptRequest, async (req, res) => {
   try {
     const item = await watchlistService.addItem(
       req.params.watchlistId,
