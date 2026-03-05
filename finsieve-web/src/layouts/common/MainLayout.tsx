@@ -50,6 +50,10 @@ import {
   ChevronLeft,
   ChevronRight,
   Article,
+  Assessment,
+  BusinessCenter,
+  PieChart,
+  CorporateFare,
 } from "@mui/icons-material";
 import { RootState } from "../../store";
 import { logout } from "../../store/slices/authSlice";
@@ -125,6 +129,30 @@ const navSections = [
         text: "Cryptocurrency",
         icon: <CryptoCurrencyIcon sx={{ fontSize: 20 }} />,
         path: "/crypto",
+        requiresAuth: false,
+      },
+      {
+        text: "ETFs",
+        icon: <Assessment sx={{ fontSize: 20 }} />,
+        path: "/screening/etf",
+        requiresAuth: false,
+      },
+      {
+        text: "SIF",
+        icon: <BusinessCenter sx={{ fontSize: 20 }} />,
+        path: "/screening/sif",
+        requiresAuth: false,
+      },
+      {
+        text: "PMS",
+        icon: <PieChart sx={{ fontSize: 20 }} />,
+        path: "/screening/pms",
+        requiresAuth: false,
+      },
+      {
+        text: "AIF",
+        icon: <CorporateFare sx={{ fontSize: 20 }} />,
+        path: "/screening/aif",
         requiresAuth: false,
       },
     ],
