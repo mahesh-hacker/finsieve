@@ -11,10 +11,12 @@ const useSsl = process.env.DATABASE_URL || process.env.DB_SSL === "true";
 const dbConfig = process.env.DATABASE_URL
   ? {
       connectionString: process.env.DATABASE_URL,
-      ssl: useSsl ? { rejectUnauthorized: false } : false,
-      max: 50,
-      min: 10,
-      idleTimeoutMillis: 60000,
+      ssl: { rejectUnauthorized: false },
+      // Force IPv4 — Railway doesn't support IPv6 to Supabase direct connections
+      family: 4,
+      max: 10,
+      min: 2,
+      idleTimeoutMillis: 30000,
       connectionTimeoutMillis: 10000,
       statement_timeout: 30000,
     }
