@@ -5,7 +5,9 @@ import { body, validationResult } from "express-validator";
  */
 export const validate = (validations) => {
   return async (req, res, next) => {
-    console.log("🔍 Validator - Request Body:", req.body);
+    if (process.env.NODE_ENV !== "production") {
+      console.log("🔍 Validator - Request Body keys:", req.body ? Object.keys(req.body) : []);
+    }
 
     // Run all validations
     await Promise.all(validations.map((validation) => validation.run(req)));

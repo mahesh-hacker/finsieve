@@ -10,10 +10,16 @@ const JWT_REFRESH_EXPIRY = process.env.JWT_REFRESH_EXPIRY || "7d";
 
 // Fail fast at module load — missing secrets mean no auth works at all
 if (!JWT_SECRET || JWT_SECRET.length < 32) {
-  throw new Error("FATAL: JWT_SECRET must be set and at least 32 characters long");
+  const hint = process.env.RAILWAY_ENVIRONMENT
+    ? "In Railway: open your service → Variables → add JWT_SECRET (at least 32 characters). Generate one: openssl rand -hex 32"
+    : "Set JWT_SECRET in .env (or env) with at least 32 characters. Example: openssl rand -hex 32";
+  throw new Error(`FATAL: JWT_SECRET must be set and at least 32 characters long. ${hint}`);
 }
 if (!JWT_REFRESH_SECRET || JWT_REFRESH_SECRET.length < 32) {
-  throw new Error("FATAL: JWT_REFRESH_SECRET must be set and at least 32 characters long");
+  const hint = process.env.RAILWAY_ENVIRONMENT
+    ? "In Railway: open your service → Variables → add JWT_REFRESH_SECRET (at least 32 characters). Use a different value than JWT_SECRET."
+    : "Set JWT_REFRESH_SECRET in .env with at least 32 characters (different from JWT_SECRET).";
+  throw new Error(`FATAL: JWT_REFRESH_SECRET must be set and at least 32 characters long. ${hint}`);
 }
 
 /**

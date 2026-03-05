@@ -12,8 +12,9 @@
  * transport-layer defence-in-depth, not a substitute for HTTPS.
  */
 
+// Trim so env vars match backend (no trailing newlines/spaces)
 const RAW_KEY_STRING =
-  import.meta.env.VITE_ENCRYPTION_KEY as string | undefined;
+  (import.meta.env.VITE_ENCRYPTION_KEY as string | undefined)?.trim();
 
 // ── Key derivation (cached promise) ───────────────────────────────────────────
 
@@ -32,7 +33,7 @@ async function getAesKey(): Promise<CryptoKey> {
     }
 
     const encoder   = new TextEncoder();
-    const rawKeyBuf = encoder.encode(RAW_KEY_STRING);
+    const rawKeyBuf = encoder.encode(RAW_KEY_STRING); // UTF-8, must match backend Buffer.from(RAW_KEY, "utf8")
 
     // Import the raw string as HKDF key material
     const hkdfKey = await crypto.subtle.importKey(

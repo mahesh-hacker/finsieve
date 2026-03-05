@@ -193,6 +193,54 @@ After this, the site will be fully functional with database and API in the cloud
 
 ---
 
+## "Network error" on sign-in / login
+
+Usually the frontend cannot reach the backend. Check the following.
+
+### 1. Vercel: `VITE_API_BASE_URL` must point to Railway
+
+- In **Vercel** → project → **Settings** → **Environment Variables** you must have:
+  - **`VITE_API_BASE_URL`** = `https://YOUR-RAILWAY-DOMAIN/api/v1`
+- Use your **real** Railway URL (e.g. `https://finsieve-backend-production-xxxx.up.railway.app`), with **no trailing slash**.
+- **Redeploy Vercel** after adding or changing this. Vite bakes env vars at **build time**, so an old deploy can still call `localhost`.
+
+### 2. Railway: `ALLOWED_ORIGINS` must include your Vercel URL
+
+- In **Railway** → your backend service → **Variables**:
+  - **`ALLOWED_ORIGINS`** = `https://finsieve-tau.vercel.app` (no trailing slash)
+- If this is wrong or missing, the browser may show a CORS or network-style error.
+
+### 3. Quick check in the browser
+
+- Open **https://finsieve-tau.vercel.app**, open **DevTools** (F12) → **Network** tab.
+- Try to sign in and find the failing request (e.g. to `.../auth/login`).
+- Check **Request URL**: it must be your Railway URL (e.g. `https://xxx.railway.app/api/v1/auth/login`), not `http://localhost:3000/...`.
+- If the URL is still localhost, set `VITE_API_BASE_URL` in Vercel and **redeploy**.
+
+### 4. Test the backend directly
+
+- In a browser or Postman, open: `https://YOUR-RAILWAY-URL/health`
+- You should get JSON like `{"status":"healthy",...}`. If that fails, the backend is down or the URL is wrong.
+
+---
+
+## "Encrypted data could not be verified"
+
+This means the backend could not decrypt the request (or the frontend could not decrypt the response). **The encryption key must be exactly the same on both sides.**
+
+1. **Same value everywhere**
+   - **Railway (backend):** Variable **`ENCRYPTION_KEY`** = e.g. `ff0d0d28eb6d89a4a2c1efd135c3ed7f237e35285a9f80efcbe14656a63769dc`
+   - **Vercel (frontend):** Variable **`VITE_ENCRYPTION_KEY`** = **the exact same string** (copy-paste from Railway, no extra characters).
+
+2. **No extra spaces or newlines**
+   - When pasting the key in Railway or Vercel, do not add a space or newline at the end. The code trims keys, but both sides must still be the same after trimming.
+
+3. **Redeploy both after changing the key**
+   - Change **ENCRYPTION_KEY** on Railway → redeploy backend.
+   - Change **VITE_ENCRYPTION_KEY** on Vercel → redeploy frontend (env vars are baked in at build time).
+
+---
+
 ## Railway: "Deployment failed during build process"
 
 1. **Root Directory must be `finsieve-backend`**  

@@ -16,7 +16,8 @@ import dotenv from "dotenv";
 dotenv.config();
 
 // ── Key derivation ─────────────────────────────────────────────────────────────
-const RAW_KEY = process.env.ENCRYPTION_KEY;
+// Trim so env vars with accidental newlines/spaces match frontend
+const RAW_KEY = process.env.ENCRYPTION_KEY?.trim();
 if (!RAW_KEY || RAW_KEY.length < 16) {
   if (process.env.NODE_ENV === "production") {
     throw new Error("FATAL: ENCRYPTION_KEY must be set and at least 16 characters long");
@@ -26,9 +27,9 @@ if (!RAW_KEY || RAW_KEY.length < 16) {
 
 const AES_KEY = RAW_KEY ? crypto.hkdfSync(
   "sha256",
-  Buffer.from(RAW_KEY),
-  Buffer.alloc(32),                        // zero salt is fine when deriving from a secret
-  Buffer.from("finsieve-api-v1"),          // context label
+  Buffer.from(RAW_KEY, "utf8"),
+  Buffer.alloc(32),                        // zero salt — must match frontend
+  Buffer.from("finsieve-api-v1", "utf8"),  // context label — must match frontend
   32,                                      // 256-bit output
 ) : null;
 
@@ -81,8 +82,12 @@ export const decryptRequest = (req, res, next) => {
         return res.status(400).json({ success: false, message: "Invalid encrypted payload" });
       }
       req.body = decrypted;
-    } catch (_err) {
-      return res.status(400).json({ success: false, message: "Encrypted data could not be verified" });
+    } catch (err) {
+      console.error("Decrypt failed:", err.message);
+      return res.status(400).json({
+        success: false,
+        message: "Encrypted data could not be verified. Ensure ENCRYPTION_KEY (backend) and VITE_ENCRYPTION_KEY (frontend) are identical, with no extra spaces or newlines.",
+      });
     }
   }
   next();
