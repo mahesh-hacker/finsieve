@@ -4,39 +4,44 @@ import axios from "axios";
 dotenv.config();
 
 /**
- * Email utility — uses Resend REST API if RESEND_API_KEY is set,
- * otherwise logs to console (no-op).
+ * Email utility — uses Brevo (Sendinblue) transactional email API.
+ * Free tier: 300 emails/day, no domain verification needed.
+ * Set BREVO_API_KEY in environment variables.
  */
 
-/**
- * Send email via Resend REST API
- */
 export const sendEmail = async ({ to, subject, html, text }) => {
-  if (!process.env.RESEND_API_KEY) {
-    console.log("\n--- EMAIL (RESEND_API_KEY not set) ---");
+  if (!process.env.BREVO_API_KEY) {
+    console.log("\n--- EMAIL (BREVO_API_KEY not set) ---");
     console.log(`To: ${to} | Subject: ${subject}`);
     console.log("--------------------------------------\n");
     return { success: true, messageId: "no-provider" };
   }
 
-  const from = process.env.EMAIL_FROM || "onboarding@resend.dev";
+  const senderEmail = process.env.EMAIL_FROM || "noreply@finsieve.com";
+  const senderName = process.env.EMAIL_FROM_NAME || "Finsieve";
 
   try {
     const response = await axios.post(
-      "https://api.resend.com/emails",
-      { from: `Finsieve <${from}>`, to: [to], subject, html, text },
+      "https://api.brevo.com/v3/smtp/email",
+      {
+        sender: { name: senderName, email: senderEmail },
+        to: [{ email: to }],
+        subject,
+        htmlContent: html,
+        textContent: text,
+      },
       {
         headers: {
-          Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+          "api-key": process.env.BREVO_API_KEY,
           "Content-Type": "application/json",
         },
       },
     );
 
-    console.log("Email sent successfully:", response.data.id);
+    console.log("Email sent successfully:", response.data.messageId);
     console.log(`   To: ${to} | Subject: ${subject}`);
 
-    return { success: true, messageId: response.data.id };
+    return { success: true, messageId: response.data.messageId };
   } catch (error) {
     const detail = error.response?.data || error.message;
     console.error("Email sending failed:", JSON.stringify(detail));
