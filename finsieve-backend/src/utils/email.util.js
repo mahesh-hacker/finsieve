@@ -1,51 +1,47 @@
 import dotenv from "dotenv";
-import axios from "axios";
+import nodemailer from "nodemailer";
 
 dotenv.config();
 
 /**
- * Email utility — uses Brevo (Sendinblue) transactional email API.
- * Free tier: 300 emails/day, no domain verification needed.
- * Set BREVO_API_KEY in environment variables.
+ * Email utility — Gmail SMTP via App Password.
+ * Required env vars: EMAIL_USER (Gmail address), EMAIL_PASSWORD (16-char App Password)
  */
 
 export const sendEmail = async ({ to, subject, html, text }) => {
-  if (!process.env.BREVO_API_KEY) {
-    console.log("\n--- EMAIL (BREVO_API_KEY not set) ---");
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
+    console.log("\n--- EMAIL (EMAIL_USER/EMAIL_PASSWORD not set) ---");
     console.log(`To: ${to} | Subject: ${subject}`);
-    console.log("--------------------------------------\n");
+    console.log("-------------------------------------------------\n");
     return { success: true, messageId: "no-provider" };
   }
 
-  const senderEmail = process.env.EMAIL_FROM || "noreply@finsieve.com";
-  const senderName = process.env.EMAIL_FROM_NAME || "Finsieve";
+  const transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true,
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASSWORD,
+    },
+  });
 
   try {
-    const response = await axios.post(
-      "https://api.brevo.com/v3/smtp/email",
-      {
-        sender: { name: senderName, email: senderEmail },
-        to: [{ email: to }],
-        subject,
-        htmlContent: html,
-        textContent: text,
-      },
-      {
-        headers: {
-          "api-key": process.env.BREVO_API_KEY,
-          "Content-Type": "application/json",
-        },
-      },
-    );
+    const info = await transporter.sendMail({
+      from: `"Finsieve" <${process.env.EMAIL_USER}>`,
+      to,
+      subject,
+      html,
+      text,
+    });
 
-    console.log("Email sent successfully:", response.data.messageId);
+    console.log("Email sent successfully:", info.messageId);
     console.log(`   To: ${to} | Subject: ${subject}`);
 
-    return { success: true, messageId: response.data.messageId };
+    return { success: true, messageId: info.messageId };
   } catch (error) {
-    const detail = error.response?.data || error.message;
-    console.error("Email sending failed:", JSON.stringify(detail));
-    throw new Error(`Failed to send email: ${JSON.stringify(detail)}`);
+    console.error("Email sending failed:", error.message);
+    throw new Error(`Failed to send email: ${error.message}`);
   }
 };
 
