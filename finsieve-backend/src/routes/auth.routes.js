@@ -60,6 +60,8 @@ router.post("/logout", authController.logout);
  */
 router.post(
   "/forgot-password",
+  decryptRequest,
+  encryptResponse,
   authValidator.validate(authValidator.forgotPasswordValidation),
   authController.forgotPassword,
 );
@@ -84,6 +86,8 @@ router.post(
  */
 router.post(
   "/verify-email",
+  decryptRequest,
+  encryptResponse,
   authValidator.validate(authValidator.verifyEmailValidation),
   authController.verifyEmail,
 );
@@ -95,6 +99,8 @@ router.post(
  */
 router.post(
   "/resend-verification",
+  decryptRequest,
+  encryptResponse,
   authValidator.validate(authValidator.resendVerificationValidation),
   authController.resendVerification,
 );
