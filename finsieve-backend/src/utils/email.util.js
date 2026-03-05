@@ -4,50 +4,63 @@ import nodemailer from "nodemailer";
 dotenv.config();
 
 /**
- * Email utility for sending emails via Gmail SMTP
+ * Email utility — uses Resend SMTP relay if RESEND_API_KEY is set,
+ * falls back to Gmail SMTP if EMAIL_PASSWORD is set,
+ * otherwise logs to console in development.
  */
 
 const isDevelopment = process.env.NODE_ENV === "development";
 
-// Create Gmail transporter
 const createEmailTransporter = () => {
-  const emailConfig = {
+  // Resend SMTP relay: works reliably from cloud providers (Railway, Render, etc.)
+  if (process.env.RESEND_API_KEY) {
+    return nodemailer.createTransport({
+      host: "smtp.resend.com",
+      port: 465,
+      secure: true,
+      auth: {
+        user: "resend",
+        pass: process.env.RESEND_API_KEY,
+      },
+    });
+  }
+
+  // Fallback: Gmail SMTP (may be blocked by Google on cloud provider IPs)
+  return nodemailer.createTransport({
     service: "gmail",
     auth: {
-      user: process.env.EMAIL_USER || "info.cayote@gmail.com",
-      pass: process.env.EMAIL_PASSWORD, // Gmail App Password
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASSWORD,
     },
-  };
-
-  return nodemailer.createTransport(emailConfig);
+  });
 };
 
+const getSenderAddress = () =>
+  process.env.EMAIL_FROM ||
+  process.env.EMAIL_USER ||
+  "noreply@finsieve.com";
+
 /**
- * Send email via Gmail SMTP
+ * Send email
  */
 export const sendEmail = async ({ to, subject, html, text }) => {
-  if (isDevelopment && !process.env.EMAIL_PASSWORD) {
-    // Development mode without email configured - just log
-    console.log("\n📧 ================================");
-    console.log("📧 EMAIL (Development Mode - No SMTP Configured)");
-    console.log("📧 ================================");
-    console.log(`From: ${process.env.EMAIL_USER || "info.cayote@gmail.com"}`);
+  const hasEmailConfig = process.env.RESEND_API_KEY || process.env.EMAIL_PASSWORD;
+
+  if (!hasEmailConfig) {
+    // No email provider configured — log to console
+    console.log("\n--- EMAIL (No provider configured) ---");
     console.log(`To: ${to}`);
     console.log(`Subject: ${subject}`);
-    console.log("--- Content ---");
     console.log(text || html);
-    console.log("📧 ================================\n");
-    return { success: true, messageId: "dev-mode" };
+    console.log("--------------------------------------\n");
+    return { success: true, messageId: "no-provider" };
   }
 
   try {
     const transporter = createEmailTransporter();
 
     const mailOptions = {
-      from: {
-        name: "Finsieve",
-        address: process.env.EMAIL_USER || "info.cayote@gmail.com",
-      },
+      from: { name: "Finsieve", address: getSenderAddress() },
       to,
       subject,
       html,
@@ -56,13 +69,12 @@ export const sendEmail = async ({ to, subject, html, text }) => {
 
     const info = await transporter.sendMail(mailOptions);
 
-    console.log("✅ Email sent successfully:", info.messageId);
-    console.log(`   To: ${to}`);
-    console.log(`   Subject: ${subject}`);
+    console.log("Email sent successfully:", info.messageId);
+    console.log(`   To: ${to} | Subject: ${subject}`);
 
     return { success: true, messageId: info.messageId };
   } catch (error) {
-    console.error("❌ Email sending failed:", error.message);
+    console.error("Email sending failed:", error.message);
     throw new Error(`Failed to send email: ${error.message}`);
   }
 };
