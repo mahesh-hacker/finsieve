@@ -1,81 +1,46 @@
 import dotenv from "dotenv";
-import nodemailer from "nodemailer";
+import axios from "axios";
 
 dotenv.config();
 
 /**
- * Email utility — uses Resend SMTP relay if RESEND_API_KEY is set,
- * falls back to Gmail SMTP if EMAIL_PASSWORD is set,
- * otherwise logs to console in development.
+ * Email utility — uses Resend REST API if RESEND_API_KEY is set,
+ * otherwise logs to console (no-op).
  */
-
-const isDevelopment = process.env.NODE_ENV === "development";
-
-const createEmailTransporter = () => {
-  // Resend SMTP relay: works reliably from cloud providers (Railway, Render, etc.)
-  if (process.env.RESEND_API_KEY) {
-    return nodemailer.createTransport({
-      host: "smtp.resend.com",
-      port: 465,
-      secure: true,
-      auth: {
-        user: "resend",
-        pass: process.env.RESEND_API_KEY,
-      },
-    });
-  }
-
-  // Fallback: Gmail SMTP (may be blocked by Google on cloud provider IPs)
-  return nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASSWORD,
-    },
-  });
-};
-
-const getSenderAddress = () =>
-  process.env.EMAIL_FROM ||
-  process.env.EMAIL_USER ||
-  "noreply@finsieve.com";
 
 /**
- * Send email
+ * Send email via Resend REST API
  */
 export const sendEmail = async ({ to, subject, html, text }) => {
-  const hasEmailConfig = process.env.RESEND_API_KEY || process.env.EMAIL_PASSWORD;
-
-  if (!hasEmailConfig) {
-    // No email provider configured — log to console
-    console.log("\n--- EMAIL (No provider configured) ---");
-    console.log(`To: ${to}`);
-    console.log(`Subject: ${subject}`);
-    console.log(text || html);
+  if (!process.env.RESEND_API_KEY) {
+    console.log("\n--- EMAIL (RESEND_API_KEY not set) ---");
+    console.log(`To: ${to} | Subject: ${subject}`);
     console.log("--------------------------------------\n");
     return { success: true, messageId: "no-provider" };
   }
 
+  const from = process.env.EMAIL_FROM || "onboarding@resend.dev";
+
   try {
-    const transporter = createEmailTransporter();
+    const response = await axios.post(
+      "https://api.resend.com/emails",
+      { from: `Finsieve <${from}>`, to: [to], subject, html, text },
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+      },
+    );
 
-    const mailOptions = {
-      from: { name: "Finsieve", address: getSenderAddress() },
-      to,
-      subject,
-      html,
-      text,
-    };
-
-    const info = await transporter.sendMail(mailOptions);
-
-    console.log("Email sent successfully:", info.messageId);
+    console.log("Email sent successfully:", response.data.id);
     console.log(`   To: ${to} | Subject: ${subject}`);
 
-    return { success: true, messageId: info.messageId };
+    return { success: true, messageId: response.data.id };
   } catch (error) {
-    console.error("Email sending failed:", error.message);
-    throw new Error(`Failed to send email: ${error.message}`);
+    const detail = error.response?.data || error.message;
+    console.error("Email sending failed:", JSON.stringify(detail));
+    throw new Error(`Failed to send email: ${JSON.stringify(detail)}`);
   }
 };
 
