@@ -50,6 +50,19 @@ If you see **"FATAL: JWT_SECRET must be set and at least 32 characters long"**, 
 
 Result: **Vercel (frontend)** → **Railway (API)** → **Supabase (database)**. Login/signup and all API features use the same DB.
 
+### 4. After every successful deployment — push to GitHub
+
+Keep the repo in sync so deployments and code match:
+
+```bash
+git status
+git add <changed-files>
+git commit -m "chore: post-deployment sync"
+git push origin main
+```
+
+**Rule:** After every successful deploy (Vercel/Railway), commit any config or code changes and push to GitHub so the repo stays the source of truth.
+
 ---
 
 To get a **fully functional website** (not just frontend), you need all three in the cloud:

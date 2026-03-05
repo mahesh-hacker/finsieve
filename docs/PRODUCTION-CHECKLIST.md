@@ -51,6 +51,7 @@
 - [ ] **HSTS** — Enabled by platform or via Helmet
 - [ ] **Monitoring** — Health check `/health`; log errors to service of choice
 - [ ] **Backup** — Supabase/DB backups per provider settings
+- [ ] **Push to GitHub** — After every successful deployment, commit and push changes so the repo stays in sync (`git add . && git commit -m "chore: post-deployment sync" && git push origin main`)
 
 ---
 
