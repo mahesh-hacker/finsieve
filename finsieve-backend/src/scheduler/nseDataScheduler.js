@@ -43,6 +43,11 @@ class NSEDataScheduler {
     // One-time cleanup: remove duplicate index rows (e.g. NIFTY vs NIFTY50)
     realNSEDataService.deduplicateIndices();
 
+    // Seed all indices on startup regardless of market hours (NSE returns last-traded values)
+    realNSEDataService.updateNSEIndices()
+      .then((r) => console.log(`✅ Startup seed: ${r?.updated ?? 0}/${r?.total ?? 0} NSE indices populated`))
+      .catch((e) => console.warn("⚠️  Startup seed failed (will retry when market opens):", e.message));
+
     nseIndicesWebSocketService.setMarketOpen(isMarketOpen("India"));
 
     // Start Nifty 50 WebSocket when market is open (with session cookies)
