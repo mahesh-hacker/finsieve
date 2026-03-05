@@ -49,46 +49,74 @@ export const sendEmail = async ({ to, subject, html, text }) => {
   }
 };
 
+const emailWrapper = (content) => `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f4f6f9;font-family:'Segoe UI',Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f6f9;padding:40px 0;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.08);">
+        <tr>
+          <td style="background:linear-gradient(135deg,#2563eb 0%,#7c3aed 100%);padding:32px 40px;text-align:center;">
+            <h1 style="margin:0;color:#ffffff;font-size:28px;font-weight:700;letter-spacing:-0.5px;">Finsieve</h1>
+            <p style="margin:4px 0 0;color:rgba(255,255,255,0.8);font-size:13px;">360° Investment Intelligence</p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:40px;">
+            ${content}
+          </td>
+        </tr>
+        <tr>
+          <td style="background:#f8fafc;padding:24px 40px;text-align:center;border-top:1px solid #e2e8f0;">
+            <p style="margin:0;color:#94a3b8;font-size:12px;">© 2026 Finsieve. All rights reserved.</p>
+            <p style="margin:4px 0 0;color:#94a3b8;font-size:12px;">This email was sent to you because you have an account on Finsieve.</p>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+
+const ctaButton = (url, label) => `
+  <div style="text-align:center;margin:32px 0;">
+    <a href="${url}" style="display:inline-block;background:linear-gradient(135deg,#2563eb 0%,#7c3aed 100%);color:#ffffff;text-decoration:none;padding:14px 36px;border-radius:8px;font-weight:600;font-size:15px;letter-spacing:0.3px;">${label}</a>
+  </div>`;
+
 /**
  * Send welcome email
  */
 export const sendWelcomeEmail = async (email, firstName) => {
   const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
 
-  const subject = "Welcome to Finsieve! 🎉";
-  const html = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <h1 style="color: #2563eb;">Welcome to Finsieve!</h1>
-      <p>Hi ${firstName},</p>
-      <p>Thank you for joining Finsieve - your 360° Investment Intelligence Platform!</p>
-      <p>You now have access to:</p>
-      <ul>
-        <li>🌍 8+ Asset Classes (Equities, Mutual Funds, Crypto & more)</li>
-        <li>🔍 Advanced Screening with 50+ parameters</li>
-        <li>📊 Real-time Market Data</li>
-        <li>📈 Comparison Tools</li>
-        <li>🎯 Personalized Watchlists</li>
-      </ul>
-      <p>Start exploring now: <a href="${frontendUrl}">Login to Finsieve</a></p>
-      <p>Happy Investing!</p>
-      <p>- The Finsieve Team</p>
-    </div>
-  `;
+  const subject = "Welcome to Finsieve!";
+  const html = emailWrapper(`
+    <h2 style="margin:0 0 8px;color:#1e293b;font-size:22px;">Welcome aboard, ${firstName}!</h2>
+    <p style="margin:0 0 20px;color:#64748b;font-size:15px;line-height:1.6;">Thank you for joining Finsieve — your 360° Investment Intelligence Platform. Your account is ready to go.</p>
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 28px;">
+      ${[
+        ["📊", "Real-time Market Data", "Live prices across NSE, BSE, MCX and global markets"],
+        ["🔍", "Advanced Screening", "Filter stocks with 50+ parameters"],
+        ["📈", "Multi-Asset Coverage", "Equities, Mutual Funds, Crypto & more"],
+        ["🎯", "Personalized Watchlists", "Track the assets that matter to you"],
+      ].map(([icon, title, desc]) => `
+      <tr>
+        <td width="44" valign="top" style="padding:0 0 16px;">
+          <div style="width:36px;height:36px;background:#eff6ff;border-radius:8px;text-align:center;line-height:36px;font-size:18px;">${icon}</div>
+        </td>
+        <td valign="top" style="padding:0 0 16px 12px;">
+          <p style="margin:0;color:#1e293b;font-weight:600;font-size:14px;">${title}</p>
+          <p style="margin:2px 0 0;color:#64748b;font-size:13px;">${desc}</p>
+        </td>
+      </tr>`).join("")}
+    </table>
+    ${ctaButton(frontendUrl, "Start Exploring")}
+    <p style="margin:24px 0 0;color:#94a3b8;font-size:13px;text-align:center;">Happy Investing!<br>The Finsieve Team</p>
+  `);
 
-  const text = `
-Welcome to Finsieve!
-
-Hi ${firstName},
-
-Thank you for joining Finsieve - your 360° Investment Intelligence Platform!
-
-You now have access to 8+ Asset Classes, Advanced Screening, Real-time Market Data, and more.
-
-Start exploring now: ${frontendUrl}
-
-Happy Investing!
-- The Finsieve Team
-  `;
+  const text = `Welcome to Finsieve, ${firstName}!\n\nYour account is ready. Start exploring: ${frontendUrl}\n\nHappy Investing!\n- The Finsieve Team`;
 
   return sendEmail({ to: email, subject, html, text });
 };
@@ -101,50 +129,17 @@ export const sendPasswordResetEmail = async (email, firstName, resetToken) => {
   const resetUrl = `${frontendUrl}/reset-password?token=${resetToken}`;
 
   const subject = "Reset Your Finsieve Password";
-  const html = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <h1 style="color: #2563eb;">Reset Your Password</h1>
-      <p>Hi ${firstName},</p>
-      <p>We received a request to reset your password for your Finsieve account.</p>
-      <p>Click the button below to reset your password:</p>
-      <div style="text-align: center; margin: 30px 0;">
-        <a href="${resetUrl}" 
-           style="background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
-                  color: white;
-                  padding: 12px 30px;
-                  text-decoration: none;
-                  border-radius: 8px;
-                  display: inline-block;
-                  font-weight: bold;">
-          Reset Password
-        </a>
-      </div>
-      <p>Or copy and paste this link into your browser:</p>
-      <p style="background: #f3f4f6; padding: 10px; border-radius: 4px; word-break: break-all;">
-        ${resetUrl}
-      </p>
-      <p><strong>This link will expire in 1 hour.</strong></p>
-      <p>If you didn't request this password reset, please ignore this email or contact support if you have concerns.</p>
-      <p>- The Finsieve Team</p>
+  const html = emailWrapper(`
+    <h2 style="margin:0 0 8px;color:#1e293b;font-size:22px;">Reset Your Password</h2>
+    <p style="margin:0 0 20px;color:#64748b;font-size:15px;line-height:1.6;">Hi ${firstName}, we received a request to reset the password for your Finsieve account.</p>
+    <div style="background:#fef9c3;border:1px solid #fde047;border-radius:8px;padding:14px 18px;margin:0 0 24px;">
+      <p style="margin:0;color:#854d0e;font-size:13px;"><strong>This link expires in 1 hour.</strong> If you didn't request a reset, you can safely ignore this email.</p>
     </div>
-  `;
+    ${ctaButton(resetUrl, "Reset Password")}
+    <p style="margin:24px 0 0;color:#94a3b8;font-size:13px;text-align:center;">The Finsieve Team</p>
+  `);
 
-  const text = `
-Reset Your Password
-
-Hi ${firstName},
-
-We received a request to reset your password for your Finsieve account.
-
-Click this link to reset your password:
-${resetUrl}
-
-This link will expire in 1 hour.
-
-If you didn't request this password reset, please ignore this email.
-
-- The Finsieve Team
-  `;
+  const text = `Reset Your Finsieve Password\n\nHi ${firstName},\n\nClick the link below to reset your password (expires in 1 hour):\n${resetUrl}\n\nIf you didn't request this, ignore this email.\n\n- The Finsieve Team`;
 
   return sendEmail({ to: email, subject, html, text });
 };
@@ -161,46 +156,14 @@ export const sendEmailVerificationEmail = async (
   const verificationUrl = `${frontendUrl}/verify-email?token=${verificationToken}`;
 
   const subject = "Verify Your Finsieve Email";
-  const html = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <h1 style="color: #2563eb;">Verify Your Email</h1>
-      <p>Hi ${firstName},</p>
-      <p>Thanks for signing up for Finsieve! Please verify your email address to get started.</p>
-      <div style="text-align: center; margin: 30px 0;">
-        <a href="${verificationUrl}" 
-           style="background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
-                  color: white;
-                  padding: 12px 30px;
-                  text-decoration: none;
-                  border-radius: 8px;
-                  display: inline-block;
-                  font-weight: bold;">
-          Verify Email
-        </a>
-      </div>
-      <p>Or copy and paste this link into your browser:</p>
-      <p style="background: #f3f4f6; padding: 10px; border-radius: 4px; word-break: break-all;">
-        ${verificationUrl}
-      </p>
-      <p><strong>This link will expire in 24 hours.</strong></p>
-      <p>- The Finsieve Team</p>
-    </div>
-  `;
+  const html = emailWrapper(`
+    <h2 style="margin:0 0 8px;color:#1e293b;font-size:22px;">Verify Your Email</h2>
+    <p style="margin:0 0 20px;color:#64748b;font-size:15px;line-height:1.6;">Hi ${firstName}, thanks for signing up! Click the button below to verify your email address and activate your account.</p>
+    ${ctaButton(verificationUrl, "Verify Email Address")}
+    <p style="margin:24px 0 0;color:#94a3b8;font-size:13px;text-align:center;">This link expires in 24 hours.<br>The Finsieve Team</p>
+  `);
 
-  const text = `
-Verify Your Email
-
-Hi ${firstName},
-
-Thanks for signing up for Finsieve! Please verify your email address to get started.
-
-Click this link to verify:
-${verificationUrl}
-
-This link will expire in 24 hours.
-
-- The Finsieve Team
-  `;
+  const text = `Verify Your Finsieve Email\n\nHi ${firstName},\n\nClick the link below to verify your email (expires in 24 hours):\n${verificationUrl}\n\n- The Finsieve Team`;
 
   return sendEmail({ to: email, subject, html, text });
 };
