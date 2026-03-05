@@ -6,6 +6,7 @@
 import express from "express";
 import comparisonService from "../services/comparison.service.js";
 import { authenticate } from "../middleware/auth.middleware.js";
+import { decryptRequest, encryptResponse } from "../middleware/encryption.middleware.js";
 
 const router = express.Router();
 
@@ -13,7 +14,7 @@ const router = express.Router();
 router.use(authenticate);
 
 // ─── COMPARE INSTRUMENTS ───────────────────────────────────
-router.post("/", async (req, res) => {
+router.post("/", decryptRequest, encryptResponse, async (req, res) => {
   try {
     const { instruments } = req.body;
 

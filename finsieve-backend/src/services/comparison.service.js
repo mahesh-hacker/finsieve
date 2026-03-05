@@ -7,6 +7,7 @@
 import yahooFinanceService from "./yahooFinance.service.js";
 import cryptoService from "./crypto.service.js";
 import mutualFundService from "./mutualFund.service.js";
+import { INDIAN_STOCKS } from "../data/marketData.js";
 import NodeCache from "node-cache";
 
 const cache = new NodeCache({ stdTTL: 30, checkperiod: 35 });
@@ -106,6 +107,21 @@ class ComparisonService {
         );
         if (!data) throw new Error(`Index ${symbol} not found`);
         data.asset_class = "INDEX";
+        break;
+      }
+      case "INDIAN_EQUITY": {
+        // Look up from static data — live price via Yahoo Finance (NSE symbol .NS)
+        const stock = INDIAN_STOCKS.find(
+          (s) => s.symbol.toUpperCase() === symbol.toUpperCase(),
+        );
+        try {
+          const yData = await yahooFinanceService.getStockDetail(`${symbol}.NS`);
+          data = { ...yData, asset_class: "INDIAN_EQUITY", sector: stock?.sector };
+        } catch {
+          // fallback to static data only
+          if (!stock) throw new Error(`Indian stock ${symbol} not found`);
+          data = { symbol: stock.symbol, name: stock.name, sector: stock.sector, asset_class: "INDIAN_EQUITY" };
+        }
         break;
       }
       default:
@@ -246,7 +262,7 @@ class ComparisonService {
       results.push(
         ...matchingCommodities.slice(0, 3).map((c) => ({
           symbol: c.symbol,
-          name: c.name,
+          name: c.name || c.symbol,
           asset_class: "COMMODITY",
           exchange: c.unit || "Futures",
         })),
@@ -255,7 +271,35 @@ class ComparisonService {
       /* skip on error */
     }
 
-    return results;
+    // Search Indian equities from static list
+    try {
+      const matchingIndian = INDIAN_STOCKS.filter(
+        (s) =>
+          s.symbol?.toLowerCase().includes(q) ||
+          s.name?.toLowerCase().includes(q),
+      );
+      results.push(
+        ...matchingIndian.slice(0, 5).map((s) => ({
+          symbol: s.symbol,
+          name: s.name,
+          asset_class: "INDIAN_EQUITY",
+          exchange: "NSE",
+        })),
+      );
+    } catch (e) {
+      /* skip on error */
+    }
+
+    // Deduplicate by symbol+asset_class and ensure name is always set
+    const seen = new Set();
+    return results
+      .filter((r) => {
+        const key = `${r.symbol}_${r.asset_class}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      })
+      .map((r) => ({ ...r, name: r.name || r.symbol }));
   }
 }
 

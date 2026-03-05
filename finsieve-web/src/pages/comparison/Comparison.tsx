@@ -32,6 +32,7 @@ import toast from "react-hot-toast";
 
 const ASSET_CLASS_LABELS: Record<string, string> = {
   US_EQUITY: "🇺🇸 US Equity",
+  INDIAN_EQUITY: "🇮🇳 Indian Equity",
   CRYPTO: "🪙 Crypto",
   MUTUAL_FUND: "📊 Mutual Fund",
   COMMODITY: "🛢️ Commodity",
@@ -41,6 +42,7 @@ const ASSET_CLASS_LABELS: Record<string, string> = {
 
 const ASSET_CLASS_COLORS: Record<string, string> = {
   US_EQUITY: "#3b82f6",
+  INDIAN_EQUITY: "#f97316",
   CRYPTO: "#f59e0b",
   MUTUAL_FUND: "#10b981",
   COMMODITY: "#ef4444",
