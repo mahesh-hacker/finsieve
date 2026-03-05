@@ -155,7 +155,7 @@ router.get("/quick/:screenId", async (req, res) => {
   }
 });
 
-// ─── SUPPORTED ASSET CLASSES ───────────────────────────────
+// ─── SUPPORTED ASSET CLASSES (ETF, SIF, PMS, AIF below Mutual Funds) ─────
 router.get("/asset-classes", (req, res) => {
   res.json({
     success: true,
@@ -163,13 +163,13 @@ router.get("/asset-classes", (req, res) => {
       { key: "US_EQUITY", label: "US Equities", icon: "📈", description: "NYSE/NASDAQ stocks" },
       { key: "CRYPTO", label: "Cryptocurrency", icon: "₿", description: "Top 100 by market cap" },
       { key: "MUTUAL_FUND", label: "Mutual Funds", icon: "🏛️", description: "Indian AMFI registered schemes" },
-      { key: "COMMODITY", label: "Commodities", icon: "🥇", description: "Gold, Oil, Agriculture & more" },
-      { key: "BOND", label: "Bonds & Treasury", icon: "📋", description: "US Treasury yields" },
-      { key: "INDEX", label: "Global Indices", icon: "🌍", description: "20+ global market indices" },
       { key: "ETF", label: "ETFs", icon: "📊", description: "Indian ETFs — NSE/BSE, AUM, TER, returns" },
       { key: "SIF", label: "SIF", icon: "🎯", description: "Specialized Investment Funds (₹10L+)" },
       { key: "PMS", label: "PMS", icon: "💼", description: "Portfolio Management Services (₹50L+)" },
       { key: "AIF", label: "AIF", icon: "🏦", description: "Alternative Investment Funds (₹1Cr+)" },
+      { key: "COMMODITY", label: "Commodities", icon: "🥇", description: "Gold, Oil, Agriculture & more" },
+      { key: "BOND", label: "Bonds & Treasury", icon: "📋", description: "US Treasury yields" },
+      { key: "INDEX", label: "Global Indices", icon: "🌍", description: "20+ global market indices" },
     ],
   });
 });

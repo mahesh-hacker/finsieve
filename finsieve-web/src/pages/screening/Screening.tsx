@@ -53,6 +53,20 @@ const ASSET_CLASS_COLORS: Record<string, string> = {
   AIF: "#059669",
 };
 
+// Display order: ETF, SIF, PMS, AIF right below Mutual Funds
+const ASSET_CLASS_DISPLAY_ORDER = [
+  "US_EQUITY",
+  "CRYPTO",
+  "MUTUAL_FUND",
+  "ETF",
+  "SIF",
+  "PMS",
+  "AIF",
+  "COMMODITY",
+  "BOND",
+  "INDEX",
+];
+
 interface ScreeningProps {
   defaultAssetClass?: string;
 }
@@ -86,7 +100,12 @@ const Screening = ({ defaultAssetClass }: ScreeningProps) => {
         const acData = acRes as { data?: AssetClassInfo[] };
         const qsData = qsRes as { data?: QuickScreen[] };
         if (acData?.data) {
-          setAssetClasses(acData.data);
+          const ordered = [...acData.data].sort(
+            (a, b) =>
+              ASSET_CLASS_DISPLAY_ORDER.indexOf(a.key) -
+              ASSET_CLASS_DISPLAY_ORDER.indexOf(b.key),
+          );
+          setAssetClasses(ordered);
           if (defaultAssetClass && acData.data.some((ac: AssetClassInfo) => ac.key === defaultAssetClass)) {
             setSelectedAssetClass(defaultAssetClass);
           }
