@@ -136,9 +136,9 @@ export const login = async ({ emailOrPhone, password }) => {
 
     // Get user by email or phone
     const result = await query(
-      `SELECT id, email, password_hash, first_name, last_name, phone, user_tier, 
-              is_email_verified, is_active
-       FROM users 
+      `SELECT id, email, password_hash, first_name, last_name, phone, user_tier,
+              is_email_verified, is_active, created_at
+       FROM users
        WHERE ${isEmail ? "email" : "phone"} = $1`,
       [emailOrPhone],
     );
@@ -188,6 +188,7 @@ export const login = async ({ emailOrPhone, password }) => {
         phone: user.phone,
         userTier: user.user_tier,
         isEmailVerified: user.is_email_verified,
+        createdAt: user.created_at,
       },
       tokens,
     };

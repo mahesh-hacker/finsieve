@@ -25,8 +25,8 @@ export const authenticate = async (req, res, next) => {
 
     // Get user from database
     const result = await query(
-      `SELECT id, email, first_name, last_name, user_tier, is_email_verified, is_active
-       FROM users 
+      `SELECT id, email, first_name, last_name, user_tier, is_email_verified, is_active, created_at
+       FROM users
        WHERE id = $1`,
       [decoded.userId],
     );
@@ -56,6 +56,7 @@ export const authenticate = async (req, res, next) => {
       lastName: user.last_name,
       userTier: user.user_tier,
       isEmailVerified: user.is_email_verified,
+      createdAt: user.created_at,
     };
 
     next();
@@ -84,8 +85,8 @@ export const optionalAuth = async (req, res, next) => {
     const decoded = verifyAccessToken(token);
 
     const result = await query(
-      `SELECT id, email, first_name, last_name, user_tier, is_email_verified, is_active
-       FROM users 
+      `SELECT id, email, first_name, last_name, user_tier, is_email_verified, is_active, created_at
+       FROM users
        WHERE id = $1 AND is_active = true`,
       [decoded.userId],
     );
@@ -99,6 +100,7 @@ export const optionalAuth = async (req, res, next) => {
         lastName: user.last_name,
         userTier: user.user_tier,
         isEmailVerified: user.is_email_verified,
+        createdAt: user.created_at,
       };
     }
 
