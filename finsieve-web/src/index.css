@@ -1,0 +1,403 @@
+/* ═══════════════════════════════════════════════════════════════
+   FINSIEVE — Premium Design System
+   Inspired by Bloomberg Terminal × Apple Design × Netflix UX
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── CSS Custom Properties ──────────────────────────────────── */
+:root {
+  /* Surface System — Light (default) */
+  --fs-bg-primary: #f8fafc;
+  --fs-bg-secondary: #ffffff;
+  --fs-bg-elevated: #f1f5f9;
+  --fs-bg-card: rgba(255, 255, 255, 0.9);
+  --fs-bg-glass: rgba(255, 255, 255, 0.6);
+
+  /* Border System */
+  --fs-border: rgba(0, 0, 0, 0.08);
+  --fs-border-hover: rgba(0, 0, 0, 0.15);
+  --fs-border-active: rgba(99, 102, 241, 0.4);
+
+  /* Text System */
+  --fs-text-primary: #0f172a;
+  --fs-text-secondary: #64748b;
+  --fs-text-tertiary: #94a3b8;
+  --fs-text-muted: #cbd5e1;
+
+  /* Accent System */
+  --fs-accent: #6366f1;
+  --fs-accent-light: #818cf8;
+  --fs-accent-glow: rgba(99, 102, 241, 0.15);
+
+  /* Market Signal Colors */
+  --fs-green: #10b981;
+  --fs-green-light: #34d399;
+  --fs-green-bg: rgba(16, 185, 129, 0.1);
+  --fs-green-glow: rgba(16, 185, 129, 0.2);
+  --fs-red: #ef4444;
+  --fs-red-light: #f87171;
+  --fs-red-bg: rgba(239, 68, 68, 0.1);
+  --fs-red-glow: rgba(239, 68, 68, 0.2);
+
+  /* Spacing & Radius */
+  --fs-radius-sm: 8px;
+  --fs-radius-md: 12px;
+  --fs-radius-lg: 16px;
+  --fs-radius-xl: 20px;
+
+  /* Shadows */
+  --fs-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --fs-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+  --fs-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.1);
+  --fs-shadow-glow: 0 0 20px rgba(99, 102, 241, 0.1);
+}
+
+/* ─── Responsive base: prevent horizontal overflow ───────────── */
+html {
+  -webkit-text-size-adjust: 100%;
+}
+html,
+body {
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+#root {
+  min-height: 100vh;
+  min-height: 100dvh;
+  min-width: 0;
+  overflow-x: hidden;
+}
+/* Safe area: use env() in fixed elements (e.g. app bar) if needed */
+
+/* ─── Global Typography (applied to all themes) ─────────────── */
+html {
+  font-family:
+    "Inter",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    system-ui,
+    sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+/* ─── Dark Theme Variables ───────────────────────────────────── */
+[data-theme="dark"] {
+  --fs-bg-primary: #0a0e17;
+  --fs-bg-secondary: #111827;
+  --fs-bg-elevated: #1a2035;
+  --fs-bg-card: rgba(17, 24, 39, 0.7);
+  --fs-bg-glass: rgba(17, 24, 39, 0.5);
+
+  --fs-border: rgba(255, 255, 255, 0.06);
+  --fs-border-hover: rgba(255, 255, 255, 0.12);
+
+  --fs-text-primary: #f1f5f9;
+  --fs-text-secondary: #94a3b8;
+  --fs-text-tertiary: #64748b;
+  --fs-text-muted: #475569;
+
+  --fs-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --fs-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+  --fs-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+  --fs-shadow-glow: 0 0 20px rgba(99, 102, 241, 0.15);
+}
+
+/* ─── Global Reset ──────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: var(--fs-bg-primary);
+  color: var(--fs-text-primary);
+  overflow-x: hidden;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* ─── Premium Scrollbar ─────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+}
+
+/* ─── Selection ──────────────────────────────────────────────── */
+::selection {
+  background: rgba(99, 102, 241, 0.3);
+  color: #f1f5f9;
+}
+
+/* ─── Utility Classes ────────────────────────────────────────── */
+.mono {
+  font-family: "JetBrains Mono", "SF Mono", "Fira Code", monospace;
+}
+
+.text-green {
+  color: var(--fs-green) !important;
+}
+.text-red {
+  color: var(--fs-red) !important;
+}
+.text-muted {
+  color: var(--fs-text-secondary) !important;
+}
+
+/* ─── Animations ─────────────────────────────────────────────── */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 4px var(--fs-green);
+    opacity: 1;
+  }
+  50% {
+    box-shadow: 0 0 12px var(--fs-green);
+    opacity: 0.7;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes ticker-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+/* ─── Live Indicator ─────────────────────────────────────────── */
+.live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--fs-green);
+  animation: pulse-glow 2s ease-in-out infinite;
+  display: inline-block;
+}
+
+/* ─── Skeleton Loading ───────────────────────────────────────── */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--fs-bg-elevated) 25%,
+    rgba(255, 255, 255, 0.05) 50%,
+    var(--fs-bg-elevated) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: var(--fs-radius-sm);
+}
+
+/* ─── Staggered Animations ───────────────────────────────────── */
+.stagger-1 {
+  animation-delay: 0.05s;
+}
+.stagger-2 {
+  animation-delay: 0.1s;
+}
+.stagger-3 {
+  animation-delay: 0.15s;
+}
+.stagger-4 {
+  animation-delay: 0.2s;
+}
+.stagger-5 {
+  animation-delay: 0.25s;
+}
+.stagger-6 {
+  animation-delay: 0.3s;
+}
+
+/* ─── Number Animations ─────────────────────────────────────── */
+.price-value {
+  font-family: "JetBrains Mono", monospace;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.price-up {
+  color: var(--fs-green);
+  transition: color 0.3s ease;
+}
+
+.price-down {
+  color: var(--fs-red);
+  transition: color 0.3s ease;
+}
+
+/* ─── Flash Animation on Value Change ────────────────────────── */
+.flash-green {
+  animation: flashGreen 0.6s ease;
+}
+
+.flash-red {
+  animation: flashRed 0.6s ease;
+}
+
+@keyframes flashGreen {
+  0% {
+    background-color: transparent;
+  }
+  30% {
+    background-color: var(--fs-green-bg);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+@keyframes flashRed {
+  0% {
+    background-color: transparent;
+  }
+  30% {
+    background-color: var(--fs-red-bg);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+/* ─── AG Grid Dark Theme Overrides ───────────────────────────── */
+.ag-theme-alpine-dark {
+  --ag-background-color: transparent !important;
+  --ag-odd-row-background-color: rgba(255, 255, 255, 0.02) !important;
+  --ag-header-background-color: rgba(255, 255, 255, 0.03) !important;
+  --ag-row-hover-color: rgba(99, 102, 241, 0.08) !important;
+  --ag-border-color: var(--fs-border) !important;
+  --ag-font-family: "Inter", sans-serif !important;
+  --ag-font-size: 13px !important;
+  --ag-row-height: 44px !important;
+  --ag-header-height: 44px !important;
+}
+
+/* ─── AG Grid Light Theme Overrides ──────────────────────────── */
+.ag-theme-alpine {
+  --ag-background-color: transparent !important;
+  --ag-odd-row-background-color: rgba(0, 0, 0, 0.015) !important;
+  --ag-header-background-color: rgba(0, 0, 0, 0.02) !important;
+  --ag-row-hover-color: rgba(99, 102, 241, 0.06) !important;
+  --ag-border-color: var(--fs-border) !important;
+  --ag-font-family: "Inter", sans-serif !important;
+  --ag-font-size: 13px !important;
+  --ag-row-height: 44px !important;
+  --ag-header-height: 44px !important;
+}
+
+/* ─── Recharts Overrides ─────────────────────────────────────── */
+.recharts-cartesian-grid-horizontal line,
+.recharts-cartesian-grid-vertical line {
+  stroke: var(--fs-border) !important;
+}
+
+.recharts-text {
+  fill: var(--fs-text-secondary) !important;
+  font-family: "Inter", sans-serif !important;
+  font-size: 11px !important;
+}
+
+/* ─── Focus Styles (Accessibility) ───────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--fs-accent);
+  outline-offset: 2px;
+}
+
+/* ─── Page Transition ────────────────────────────────────────── */
+.page-enter {
+  animation: fadeInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
+}

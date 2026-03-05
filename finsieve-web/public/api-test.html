@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>API Test</title>
+    <style>
+      body {
+        font-family: monospace;
+        padding: 20px;
+        background: #1e1e1e;
+        color: #d4d4d4;
+      }
+      .result {
+        background: #252525;
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 5px;
+        border-left: 4px solid #007acc;
+      }
+      .error {
+        border-left-color: #f44336;
+      }
+      .success {
+        border-left-color: #4caf50;
+      }
+      button {
+        background: #007acc;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 5px;
+      }
+      button:hover {
+        background: #005a9e;
+      }
+      pre {
+        background: #1e1e1e;
+        padding: 10px;
+        border-radius: 4px;
+        overflow-x: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🧪 Finsieve API Test</h1>
+
+    <button onclick="testMajorIndices()">Test Major Indices</button>
+    <button onclick="testMarketStatus()">Test Market Status</button>
+    <button onclick="clearResults()">Clear</button>
+
+    <div id="results"></div>
+
+    <script>
+      const API_BASE_URL = "http://localhost:3000/api/v1";
+
+      function addResult(title, data, isError = false) {
+        const resultsDiv = document.getElementById("results");
+        const resultDiv = document.createElement("div");
+        resultDiv.className = `result ${isError ? "error" : "success"}`;
+        resultDiv.innerHTML = `
+                <strong>${title}</strong>
+                <pre>${JSON.stringify(data, null, 2)}</pre>
+            `;
+        resultsDiv.insertBefore(resultDiv, resultsDiv.firstChild);
+      }
+
+      async function testMajorIndices() {
+        try {
+          console.log("🔍 Testing Major Indices API...");
+          const response = await fetch(`${API_BASE_URL}/market/indices/major`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+          });
+
+          console.log("📊 Response status:", response.status);
+          console.log("📊 Response headers:", [...response.headers.entries()]);
+
+          const data = await response.json();
+          console.log("✅ Response data:", data);
+
+          if (data.success) {
+            addResult(`✅ Major Indices (${data.data.length} indices)`, data);
+          } else {
+            addResult("❌ Major Indices Failed", data, true);
+          }
+        } catch (error) {
+          console.error("❌ Error:", error);
+          addResult(
+            "❌ Major Indices Error",
+            {
+              message: error.message,
+              stack: error.stack,
+            },
+            true,
+          );
+        }
+      }
+
+      async function testMarketStatus() {
+        try {
+          console.log("🔍 Testing Market Status API...");
+          const response = await fetch(`${API_BASE_URL}/market/status`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+          });
+
+          const data = await response.json();
+          console.log("✅ Market Status:", data);
+
+          if (data.success) {
+            addResult(
+              `✅ Market Status (${data.data.openMarkets.length} markets open)`,
+              data,
+            );
+          } else {
+            addResult("❌ Market Status Failed", data, true);
+          }
+        } catch (error) {
+          console.error("❌ Error:", error);
+          addResult(
+            "❌ Market Status Error",
+            {
+              message: error.message,
+              stack: error.stack,
+            },
+            true,
+          );
+        }
+      }
+
+      function clearResults() {
+        document.getElementById("results").innerHTML = "";
+      }
+
+      // Auto-run tests on load
+      window.onload = () => {
+        console.log("🚀 API Test Page Loaded");
+        console.log("📍 API Base URL:", API_BASE_URL);
+        testMajorIndices();
+        testMarketStatus();
+      };
+    </script>
+  </body>
+</html>
