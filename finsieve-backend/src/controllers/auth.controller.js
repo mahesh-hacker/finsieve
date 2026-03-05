@@ -28,18 +28,20 @@ export const register = async (req, res) => {
       },
     });
   } catch (error) {
-    const msg = error?.message || String(error);
-    const code = error?.code;
-    console.error("Register controller error:", msg, code ? `[${code}]` : "");
+    // Unwrap AggregateError (e.g. from bcrypt or multiple failures) to get the real cause
+    const err = error?.errors?.[0] || error;
+    const msg = err?.message || error?.message || String(error);
+    const code = err?.code ?? error?.code;
+    console.error("Register controller error:", msg, code ? `[${code}]` : "", error?.errors?.length ? `(AggregateError, ${error.errors.length} errors)` : "");
 
-    if (error?.message === "Email already registered") {
+    if (msg === "Email already registered") {
       return res.status(409).json({
         success: false,
         message: "An account with this email already exists",
       });
     }
 
-    if (error?.message === "Mobile number already registered") {
+    if (msg === "Mobile number already registered") {
       return res.status(409).json({
         success: false,
         message: "An account with this mobile number already exists",
@@ -48,7 +50,7 @@ export const register = async (req, res) => {
 
     // PostgreSQL: unique violation (email or phone)
     if (code === "23505") {
-      const constraint = error?.constraint || "";
+      const constraint = err?.constraint ?? error?.constraint ?? "";
       if (constraint.includes("email")) {
         return res.status(409).json({ success: false, message: "An account with this email already exists" });
       }
@@ -82,11 +84,12 @@ export const register = async (req, res) => {
       });
     }
 
-    // Return actual error in response so you can see it (e.g. in Network tab); safe for API consumers
+    // Return actual error in response (include first underlying error if AggregateError)
+    const detail = error?.errors?.length ? error.errors.map((e) => e?.message || String(e)).join("; ") : msg;
     return res.status(500).json({
       success: false,
       message: "Registration failed. Please try again.",
-      detail: msg,
+      detail,
     });
   }
 };

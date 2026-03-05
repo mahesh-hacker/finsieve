@@ -116,7 +116,12 @@ export const register = async ({
       tokens,
     };
   } catch (error) {
-    console.error("Registration error:", error);
+    console.error("Registration error:", error?.message ?? error, error?.errors ? error.errors : "");
+    // Unwrap AggregateError so controller gets a useful message
+    if (error?.errors?.length) {
+      const first = error.errors[0];
+      throw first instanceof Error ? first : new Error(first?.message ?? String(first));
+    }
     throw error;
   }
 };
