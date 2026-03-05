@@ -448,12 +448,12 @@ export const resendEmailVerification = async (email) => {
       [user.id, verificationToken, verificationExpiresAt],
     );
 
-    // Send verification email
-    await sendEmailVerificationEmail(
+    // Send verification email (non-blocking — don't hang the request on SMTP)
+    sendEmailVerificationEmail(
       user.email,
       user.first_name,
       verificationToken,
-    );
+    ).catch((err) => console.error("Failed to send verification email:", err));
 
     return { success: true, message: "Verification email sent" };
   } catch (error) {
