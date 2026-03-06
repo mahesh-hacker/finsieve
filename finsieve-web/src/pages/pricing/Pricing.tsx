@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
@@ -346,6 +346,8 @@ const Pricing = () => {
   const currentTier = user?.userTier ?? "FREE";
 
   const [billingPeriod, setBillingPeriod] = useState<BillingPeriod>("yearly");
+
+  useEffect(() => { window.scrollTo(0, 0); }, []);
 
   const handleSelectPlan = (plan: Plan, period: BillingPeriod) => {
     if (plan.id === "explorer") {
