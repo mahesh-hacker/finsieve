@@ -20,6 +20,7 @@ import {
   AccountBalance,
 } from "@mui/icons-material";
 import globalIndicesService from "../../services/indices/globalIndicesService";
+import { useRealTimeIndices } from "../../hooks/useRealTimeIndices";
 import toast from "react-hot-toast";
 
 interface IndianIndex {
@@ -65,6 +66,9 @@ const IndianIndices = () => {
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
   const [activeCategory, setActiveCategory] = useState(0);
 
+  // Live WebSocket updates from NSE scheduler (pushes every 5s during market hours)
+  const { indices: liveIndices, lastUpdate: liveUpdate, connected } = useRealTimeIndices("India");
+
   const fetchIndices = useCallback(async (isInitial = false) => {
     try {
       if (isInitial) setLoading(true);
@@ -91,6 +95,31 @@ const IndianIndices = () => {
     const t = setInterval(() => fetchIndices(false), 30000);
     return () => clearInterval(t);
   }, [fetchIndices]);
+
+  // Merge live WebSocket updates into the displayed indices (preserves exchange/category/note)
+  useEffect(() => {
+    if (!liveIndices.length) return;
+    setIndices((prev) => {
+      if (!prev.length) return prev;
+      const liveMap = new Map(liveIndices.map((r) => [r.symbol, r]));
+      return prev.map((idx) => {
+        const live = liveMap.get(idx.symbol);
+        if (!live) return idx;
+        return {
+          ...idx,
+          current_value: Number(live.current_value),
+          change: Number(live.change),
+          change_percent: Number(live.change_percent),
+          open: Number(live.open ?? idx.open),
+          high: Number(live.high ?? idx.high),
+          low: Number(live.low ?? idx.low),
+          previous_close: Number(live.previous_close ?? idx.previous_close),
+          last_updated: live.last_updated,
+        };
+      });
+    });
+    setLastUpdate(liveUpdate);
+  }, [liveIndices, liveUpdate]);
 
   const fmt = (n: number | string | null | undefined) => {
     if (n == null) return "—";
@@ -166,11 +195,15 @@ const IndianIndices = () => {
           >
             🇮🇳 Indian Indices
           </Typography>
-          <Typography variant="body2" sx={{ color: "text.secondary", mt: 0.5 }}>
+          <Typography variant="body2" sx={{ color: "text.secondary", mt: 0.5, display: "flex", alignItems: "center", gap: 0.75 }}>
+            {connected && (
+              <Box component="span" sx={{ width: 7, height: 7, borderRadius: "50%", bgcolor: "#10b981", display: "inline-block", animation: "pulse 2s ease-in-out infinite", "@keyframes pulse": { "0%,100%": { opacity: 1 }, "50%": { opacity: 0.3 } } }} />
+            )}
             NSE · BSE · GIFT India / NSE IFSC ·{" "}
             {lastUpdate.toLocaleTimeString("en-IN", {
               hour: "2-digit",
               minute: "2-digit",
+              second: "2-digit",
             })}
           </Typography>
         </Box>
