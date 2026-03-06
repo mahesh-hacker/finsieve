@@ -370,6 +370,7 @@ const MainLayout = () => {
 
   // Reset scroll to top on every page navigation within the layout
   useEffect(() => {
+    window.scrollTo(0, 0);
     contentRef.current?.scrollTo(0, 0);
   }, [location.pathname]);
   const dispatch = useDispatch();

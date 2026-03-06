@@ -366,18 +366,6 @@ const Pricing = () => {
     <Box sx={{ pb: 8 }}>
       {/* Header */}
       <Box sx={{ textAlign: "center", mb: 5 }}>
-        <Chip
-          label="PRODUCTION PRICING"
-          size="small"
-          sx={{
-            bgcolor: "rgba(99,102,241,0.1)",
-            color: "#6366f1",
-            fontWeight: 800,
-            fontSize: 10,
-            letterSpacing: 1.5,
-            mb: 2,
-          }}
-        />
         <Typography
           variant="h3"
           sx={{ fontWeight: 900, letterSpacing: "-0.03em", mb: 1.5, fontSize: { xs: 28, sm: 36, md: 42 } }}
