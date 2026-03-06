@@ -26,9 +26,18 @@ import {
   ListItemIcon,
   ListItemText,
   useTheme,
+  useMediaQuery,
   alpha,
   LinearProgress,
+  Dialog,
+  DialogContent,
+  Slide,
+  Fade,
+  CircularProgress,
+  Backdrop,
 } from "@mui/material";
+import type { TransitionProps } from "@mui/material/transitions";
+import React from "react";
 import {
   Person,
   Security,
@@ -46,6 +55,10 @@ import {
   PhoneAndroid,
   Email,
   Lock,
+  WarningAmber,
+  Close,
+  ArrowBack,
+  DeleteOutline,
 } from "@mui/icons-material";
 import toast from "react-hot-toast";
 import { RootState } from "../../store";
@@ -773,6 +786,463 @@ const SubscriptionSection = () => {
   );
 };
 
+// ── Slide-up transition for mobile bottom sheet ──────────────────────────────
+const SlideUp = React.forwardRef(function SlideUp(
+  props: TransitionProps & { children: React.ReactElement },
+  ref: React.Ref<unknown>,
+) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
+
+type DeleteStep = "warning" | "verify" | "verified" | "deleting";
+
+/* ─── Delete Account Modal ──────────────────────────────────────── */
+const DeleteAccountModal = ({
+  open,
+  onClose,
+}: {
+  open: boolean;
+  onClose: () => void;
+}) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const [step, setStep] = useState<DeleteStep>("warning");
+  const [password, setPassword] = useState("");
+  const [showPwd, setShowPwd] = useState(false);
+  const [verifying, setVerifying] = useState(false);
+  const [pwdError, setPwdError] = useState("");
+  const [shake, setShake] = useState(false);
+
+  const handleClose = () => {
+    if (step === "deleting") return; // Can't dismiss while deleting
+    onClose();
+    // Reset state after close animation
+    setTimeout(() => {
+      setStep("warning");
+      setPassword("");
+      setPwdError("");
+      setShowPwd(false);
+    }, 300);
+  };
+
+  const triggerShake = () => {
+    setShake(true);
+    setTimeout(() => setShake(false), 600);
+  };
+
+  const handleVerifyPassword = async () => {
+    if (!password) return;
+    setVerifying(true);
+    setPwdError("");
+    try {
+      const token = localStorage.getItem("accessToken");
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api/v1"}/auth/verify-password`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ password }),
+        },
+      );
+      const data = await res.json();
+      if (data.success) {
+        setStep("verified");
+      } else {
+        setPwdError(data.message || "Incorrect password");
+        triggerShake();
+      }
+    } catch {
+      setPwdError("Network error. Please try again.");
+      triggerShake();
+    } finally {
+      setVerifying(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    setStep("deleting");
+    try {
+      const token = localStorage.getItem("accessToken");
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api/v1"}/auth/account`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ password }),
+        },
+      );
+      const data = await res.json();
+      if (data.success) {
+        // Clear all local storage and cookies
+        localStorage.clear();
+        sessionStorage.clear();
+        dispatch({ type: "auth/logout" });
+        navigate("/", { replace: true });
+      } else {
+        setStep("verified");
+        setPwdError(data.message || "Deletion failed. Please try again.");
+        triggerShake();
+      }
+    } catch {
+      setStep("verified");
+      setPwdError("Network error. Please try again.");
+    }
+  };
+
+  const paperSx = isMobile
+    ? {
+        // Mobile: full-width bottom sheet
+        position: "fixed" as const,
+        bottom: 0,
+        left: 0,
+        right: 0,
+        m: 0,
+        borderRadius: "20px 20px 0 0",
+        maxWidth: "100%",
+        width: "100%",
+        maxHeight: "90vh",
+        overflowY: "auto" as const,
+      }
+    : {
+        // Desktop/tablet: centered modal
+        borderRadius: 3,
+        maxWidth: 500,
+        width: "100%",
+      };
+
+  return (
+    <>
+      {/* Full-screen loading overlay while deleting */}
+      <Backdrop
+        open={step === "deleting"}
+        sx={{ zIndex: theme.zIndex.modal + 10, flexDirection: "column", gap: 3 }}
+      >
+        <CircularProgress size={56} sx={{ color: "#ef4444" }} />
+        <Typography sx={{ color: "#fff", fontWeight: 600, fontSize: 16 }}>
+          Permanently deleting your account…
+        </Typography>
+      </Backdrop>
+
+      <Dialog
+        open={open && step !== "deleting"}
+        onClose={handleClose}
+        TransitionComponent={isMobile ? SlideUp : Fade}
+        PaperProps={{ sx: paperSx }}
+        slotProps={{
+          backdrop: {
+            sx: { backdropFilter: "blur(4px)", backgroundColor: "rgba(0,0,0,0.6)" },
+          },
+        }}
+      >
+        <DialogContent sx={{ p: { xs: 3, sm: 4 } }}>
+          {/* ── Step 1: Warning ── */}
+          {step === "warning" && (
+            <Box>
+              {/* Header */}
+              <Box display="flex" alignItems="flex-start" justifyContent="space-between" mb={3}>
+                <Box display="flex" alignItems="center" gap={1.5}>
+                  <Box
+                    sx={{
+                      width: 44,
+                      height: 44,
+                      borderRadius: 2,
+                      bgcolor: alpha("#ef4444", 0.1),
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0,
+                    }}
+                  >
+                    <WarningAmber sx={{ color: "#ef4444", fontSize: 24 }} />
+                  </Box>
+                  <Box>
+                    <Typography fontWeight={800} fontSize={{ xs: 17, sm: 19 }} color="#ef4444">
+                      Delete Account?
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" fontSize={12}>
+                      This action cannot be undone
+                    </Typography>
+                  </Box>
+                </Box>
+                <IconButton size="small" onClick={handleClose} sx={{ mt: -0.5, ml: 1 }}>
+                  <Close fontSize="small" />
+                </IconButton>
+              </Box>
+
+              {/* Warning body */}
+              <Box
+                sx={{
+                  bgcolor: alpha("#ef4444", 0.05),
+                  border: `1px solid ${alpha("#ef4444", 0.15)}`,
+                  borderRadius: 2,
+                  p: 2.5,
+                  mb: 3,
+                }}
+              >
+                <Typography fontWeight={700} fontSize={14} color="text.primary" mb={1.5}>
+                  Are you sure you want to delete your account?
+                </Typography>
+                <Typography fontSize={14} color="text.secondary" mb={1.5} lineHeight={1.6}>
+                  This action is <strong>irreversible</strong> and will:
+                </Typography>
+                {[
+                  "Immediately log you out of all devices",
+                  "Cancel all active subscription plans",
+                  "Permanently delete all your data and content",
+                  "No refunds will be issued for any prepaid plans",
+                ].map((item) => (
+                  <Box key={item} display="flex" alignItems="flex-start" gap={1} mb={0.75}>
+                    <Box
+                      sx={{
+                        width: 6,
+                        height: 6,
+                        borderRadius: "50%",
+                        bgcolor: "#ef4444",
+                        mt: "7px",
+                        flexShrink: 0,
+                      }}
+                    />
+                    <Typography fontSize={13.5} color="text.secondary" lineHeight={1.5}>
+                      {item}
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
+
+              <Alert
+                severity="info"
+                icon={false}
+                sx={{ borderRadius: 2, mb: 3, fontSize: 13, py: 1 }}
+              >
+                We recommend exporting your data before proceeding.
+              </Alert>
+
+              {/* Buttons */}
+              <Box
+                display="flex"
+                gap={1.5}
+                flexDirection={{ xs: "column-reverse", sm: "row" }}
+                justifyContent="flex-end"
+              >
+                <Button
+                  variant="outlined"
+                  onClick={handleClose}
+                  fullWidth={isMobile}
+                  sx={{
+                    minHeight: 44,
+                    borderRadius: 2,
+                    fontWeight: 600,
+                    borderColor: "divider",
+                    color: "text.secondary",
+                    "&:hover": { borderColor: "text.primary" },
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="contained"
+                  onClick={() => setStep("verify")}
+                  fullWidth={isMobile}
+                  sx={{
+                    minHeight: 44,
+                    borderRadius: 2,
+                    fontWeight: 700,
+                    bgcolor: "#ef4444",
+                    "&:hover": { bgcolor: "#dc2626" },
+                    boxShadow: "0 4px 14px rgba(239,68,68,0.35)",
+                  }}
+                  endIcon={<DeleteOutline />}
+                >
+                  Proceed to Delete
+                </Button>
+              </Box>
+            </Box>
+          )}
+
+          {/* ── Step 2: Password verification ── */}
+          {(step === "verify" || step === "verified") && (
+            <Box>
+              {/* Header */}
+              <Box display="flex" alignItems="center" gap={1.5} mb={3}>
+                <IconButton size="small" onClick={() => { setStep("warning"); setPwdError(""); }} sx={{ ml: -0.5 }}>
+                  <ArrowBack fontSize="small" />
+                </IconButton>
+                <Box display="flex" alignItems="center" gap={1.5}>
+                  <Box
+                    sx={{
+                      width: 44,
+                      height: 44,
+                      borderRadius: 2,
+                      bgcolor: step === "verified" ? alpha("#10b981", 0.1) : alpha("#6366f1", 0.1),
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      transition: "background-color 0.3s ease",
+                    }}
+                  >
+                    {step === "verified" ? (
+                      <CheckCircle sx={{ color: "#10b981", fontSize: 24 }} />
+                    ) : (
+                      <Lock sx={{ color: "#6366f1", fontSize: 22 }} />
+                    )}
+                  </Box>
+                  <Box>
+                    <Typography fontWeight={800} fontSize={{ xs: 17, sm: 19 }}>
+                      {step === "verified" ? "Identity Confirmed" : "Confirm Your Identity"}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" fontSize={12}>
+                      {step === "verified"
+                        ? "You can now permanently delete your account"
+                        : "Enter your password to continue"}
+                    </Typography>
+                  </Box>
+                </Box>
+              </Box>
+
+              {/* Password field */}
+              <Box
+                sx={{
+                  animation: shake ? "shake 0.5s cubic-bezier(.36,.07,.19,.97)" : "none",
+                  "@keyframes shake": {
+                    "0%,100%": { transform: "translateX(0)" },
+                    "15%,45%,75%": { transform: "translateX(-6px)" },
+                    "30%,60%,90%": { transform: "translateX(6px)" },
+                  },
+                  mb: 2,
+                }}
+              >
+                <TextField
+                  fullWidth
+                  label="Account Password"
+                  type={showPwd ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => { setPassword(e.target.value); setPwdError(""); }}
+                  onKeyDown={(e) => e.key === "Enter" && step === "verify" && password && handleVerifyPassword()}
+                  error={Boolean(pwdError)}
+                  helperText={pwdError}
+                  disabled={step === "verified" || verifying}
+                  autoFocus
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      minHeight: 52,
+                      borderRadius: 2,
+                      ...(step === "verified" && {
+                        "& fieldset": { borderColor: "#10b981" },
+                      }),
+                    },
+                  }}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        {step === "verified" ? (
+                          <CheckCircle sx={{ color: "#10b981", fontSize: 20 }} />
+                        ) : (
+                          <IconButton
+                            onClick={() => setShowPwd(!showPwd)}
+                            edge="end"
+                            size="small"
+                            disabled={verifying}
+                          >
+                            {showPwd ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        )}
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Box>
+
+              {/* Buttons */}
+              <Box
+                display="flex"
+                gap={1.5}
+                flexDirection={{ xs: "column-reverse", sm: "row" }}
+                justifyContent="flex-end"
+                mt={1}
+              >
+                <Button
+                  variant="outlined"
+                  onClick={() => { setStep("warning"); setPwdError(""); }}
+                  fullWidth={isMobile}
+                  disabled={verifying}
+                  sx={{
+                    minHeight: 44,
+                    borderRadius: 2,
+                    fontWeight: 600,
+                    borderColor: "divider",
+                    color: "text.secondary",
+                  }}
+                  startIcon={<ArrowBack />}
+                >
+                  Back
+                </Button>
+
+                {step === "verify" ? (
+                  <Button
+                    variant="contained"
+                    onClick={handleVerifyPassword}
+                    disabled={!password || verifying}
+                    fullWidth={isMobile}
+                    sx={{
+                      minHeight: 44,
+                      borderRadius: 2,
+                      fontWeight: 700,
+                      bgcolor: "#6366f1",
+                      "&:hover": { bgcolor: "#4f46e5" },
+                      minWidth: 160,
+                    }}
+                  >
+                    {verifying ? (
+                      <Box display="flex" alignItems="center" gap={1}>
+                        <CircularProgress size={16} sx={{ color: "#fff" }} />
+                        Verifying…
+                      </Box>
+                    ) : (
+                      "Verify Password"
+                    )}
+                  </Button>
+                ) : (
+                  /* Confirmed — show pulsing red delete button */
+                  <Button
+                    variant="contained"
+                    onClick={handleDeleteAccount}
+                    fullWidth={isMobile}
+                    startIcon={<DeleteForever />}
+                    sx={{
+                      minHeight: 44,
+                      borderRadius: 2,
+                      fontWeight: 800,
+                      bgcolor: "#ef4444",
+                      "&:hover": { bgcolor: "#dc2626" },
+                      boxShadow: "0 4px 14px rgba(239,68,68,0.45)",
+                      animation: "pulse-red 1.8s infinite",
+                      "@keyframes pulse-red": {
+                        "0%,100%": { boxShadow: "0 4px 14px rgba(239,68,68,0.45)" },
+                        "50%": { boxShadow: "0 4px 28px rgba(239,68,68,0.75)" },
+                      },
+                    }}
+                  >
+                    Delete My Account
+                  </Button>
+                )}
+              </Box>
+            </Box>
+          )}
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+};
+
 /* ─── Main Component ───────────────────────────────────────────── */
 const ProfileSettings = () => {
   const dispatch = useDispatch();
@@ -781,7 +1251,7 @@ const ProfileSettings = () => {
   const theme = useTheme();
 
   const [activeSection, setActiveSection] = useState("profile");
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -902,12 +1372,12 @@ const ProfileSettings = () => {
               </ListItemButton>
 
               <ListItemButton
-                onClick={() => setShowDeleteConfirm(!showDeleteConfirm)}
+                onClick={() => setDeleteModalOpen(true)}
                 sx={{
                   borderRadius: 2,
                   color: "text.disabled",
                   "& .MuiListItemIcon-root": { minWidth: 36, color: "text.disabled" },
-                  "&:hover": { background: alpha("#ef4444", 0.04), color: "#ef4444" },
+                  "&:hover": { background: alpha("#ef4444", 0.06), color: "#ef4444", "& .MuiListItemIcon-root": { color: "#ef4444" } },
                 }}
               >
                 <ListItemIcon><DeleteForever /></ListItemIcon>
@@ -919,26 +1389,15 @@ const ProfileSettings = () => {
 
         {/* ── Main Content ── */}
         <Grid size={{ xs: 12, md: 9 }}>
-          {showDeleteConfirm && (
-            <Alert
-              severity="error"
-              sx={{ borderRadius: 2, mb: 3 }}
-              action={
-                <Box display="flex" gap={1}>
-                  <Button size="small" color="inherit" onClick={() => setShowDeleteConfirm(false)}>Cancel</Button>
-                  <Button size="small" color="error" variant="contained" onClick={() => toast.error("Account deletion requires email verification - feature coming soon")}>
-                    Delete
-                  </Button>
-                </Box>
-              }
-            >
-              <strong>Delete Account?</strong> This action is permanent and cannot be undone. All your data, watchlists, and preferences will be lost.
-            </Alert>
-          )}
-
           {renderSection()}
         </Grid>
       </Grid>
+
+      {/* Delete Account Modal */}
+      <DeleteAccountModal
+        open={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+      />
     </Container>
   );
 };

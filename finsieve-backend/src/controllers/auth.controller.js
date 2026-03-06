@@ -1,4 +1,5 @@
 import * as authService from "../services/auth.service.js";
+import { sendAccountDeletionEmail } from "../utils/email.util.js";
 
 /**
  * Register new user
@@ -371,6 +372,96 @@ export const resendVerification = async (req, res) => {
   }
 };
 
+// ── Simple in-memory rate limiter for password-sensitive endpoints ──────────
+// Max 5 attempts per user per 10-minute window
+const _verifyAttempts = new Map(); // userId → { count, resetAt }
+const VERIFY_MAX = 5;
+const VERIFY_WINDOW_MS = 10 * 60 * 1000;
+
+function checkVerifyRateLimit(userId) {
+  const now = Date.now();
+  const entry = _verifyAttempts.get(String(userId));
+  if (entry && now < entry.resetAt) {
+    if (entry.count >= VERIFY_MAX) {
+      const retryAfterSec = Math.ceil((entry.resetAt - now) / 1000);
+      throw Object.assign(new Error("Too many attempts"), { retryAfter: retryAfterSec });
+    }
+    entry.count++;
+  } else {
+    _verifyAttempts.set(String(userId), { count: 1, resetAt: now + VERIFY_WINDOW_MS });
+  }
+}
+
+/**
+ * Verify password (pre-flight check before destructive operations)
+ * POST /api/v1/auth/verify-password
+ */
+export const verifyPassword = async (req, res) => {
+  try {
+    const { password } = req.body;
+    if (!password) {
+      return res.status(400).json({ success: false, message: "Password is required" });
+    }
+
+    checkVerifyRateLimit(req.user.id);
+    await authService.verifyPassword(req.user.id, password);
+
+    // Clear rate-limit counter on success
+    _verifyAttempts.delete(String(req.user.id));
+
+    res.json({ success: true, message: "Password verified" });
+  } catch (error) {
+    if (error.retryAfter) {
+      return res.status(429).json({
+        success: false,
+        message: `Too many attempts. Try again in ${error.retryAfter} seconds.`,
+        retryAfter: error.retryAfter,
+      });
+    }
+    if (error.message === "Invalid password") {
+      return res.status(401).json({ success: false, message: "Incorrect password" });
+    }
+    console.error("Verify password controller error:", error);
+    res.status(500).json({ success: false, message: "Verification failed. Please try again." });
+  }
+};
+
+/**
+ * Permanently delete authenticated user's account
+ * DELETE /api/v1/auth/account
+ */
+export const deleteAccount = async (req, res) => {
+  try {
+    const { password } = req.body;
+    if (!password) {
+      return res.status(400).json({ success: false, message: "Password is required to delete your account" });
+    }
+
+    // Re-verify password as final safeguard
+    await authService.verifyPassword(req.user.id, password);
+
+    // Delete account — returns user info for the farewell email
+    const { email, firstName, lastName } = await authService.deleteAccount(req.user.id);
+
+    // Send farewell email (non-blocking)
+    sendAccountDeletionEmail(email, firstName).catch((err) =>
+      console.error("Failed to send account deletion email:", err),
+    );
+
+    res.json({
+      success: true,
+      message: "Account permanently deleted",
+      data: { email, firstName, lastName },
+    });
+  } catch (error) {
+    if (error.message === "Invalid password") {
+      return res.status(401).json({ success: false, message: "Incorrect password" });
+    }
+    console.error("Delete account controller error:", error);
+    res.status(500).json({ success: false, message: "Failed to delete account. Please try again." });
+  }
+};
+
 export default {
   register,
   login,
@@ -381,4 +472,6 @@ export default {
   verifyEmail,
   getCurrentUser,
   resendVerification,
+  verifyPassword,
+  deleteAccount,
 };

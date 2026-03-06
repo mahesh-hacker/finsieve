@@ -168,9 +168,44 @@ export const sendEmailVerificationEmail = async (
   return sendEmail({ to: email, subject, html, text });
 };
 
+/**
+ * Send account deletion confirmation email
+ */
+export const sendAccountDeletionEmail = async (email, firstName) => {
+  const subject = "We're Sorry to See You Go";
+  const html = emailWrapper(`
+    <h2 style="margin:0 0 8px;color:#1e293b;font-size:22px;">Account Deleted</h2>
+    <p style="margin:0 0 20px;color:#64748b;font-size:15px;line-height:1.6;">
+      Hi ${firstName}, we're truly sorry to see you leave. Your Finsieve account has been
+      <strong>permanently deleted</strong> as per your request.
+    </p>
+    <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:16px 20px;margin:0 0 24px;">
+      <p style="margin:0;color:#991b1b;font-size:13px;line-height:1.6;">
+        <strong>What was removed:</strong><br>
+        • Your profile and personal data<br>
+        • All watchlists and saved preferences<br>
+        • Any active subscription has been cancelled<br>
+        • All session tokens have been invalidated
+      </p>
+    </div>
+    <p style="margin:0 0 20px;color:#64748b;font-size:15px;line-height:1.6;">
+      If this was a mistake or you change your mind, you're always welcome to create a new account.
+      We'll be here to welcome you back.
+    </p>
+    <p style="margin:24px 0 0;color:#94a3b8;font-size:13px;text-align:center;">
+      Warm regards,<br>The Finsieve Team
+    </p>
+  `);
+
+  const text = `Hi ${firstName},\n\nYour Finsieve account has been permanently deleted.\n\nIf this was a mistake, you can always create a new account at any time.\n\nWarm regards,\nThe Finsieve Team`;
+
+  return sendEmail({ to: email, subject, html, text });
+};
+
 export default {
   sendEmail,
   sendWelcomeEmail,
   sendPasswordResetEmail,
   sendEmailVerificationEmail,
+  sendAccountDeletionEmail,
 };

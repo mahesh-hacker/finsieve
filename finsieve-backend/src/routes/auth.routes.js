@@ -112,4 +112,18 @@ router.post(
  */
 router.get("/me", authenticate, authController.getCurrentUser);
 
+/**
+ * @route   POST /api/v1/auth/verify-password
+ * @desc    Verify current user's password (pre-flight for sensitive actions)
+ * @access  Private
+ */
+router.post("/verify-password", authenticate, authController.verifyPassword);
+
+/**
+ * @route   DELETE /api/v1/auth/account
+ * @desc    Permanently delete authenticated user's account
+ * @access  Private
+ */
+router.delete("/account", authenticate, authController.deleteAccount);
+
 export default router;

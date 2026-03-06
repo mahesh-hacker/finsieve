@@ -462,6 +462,44 @@ export const resendEmailVerification = async (email) => {
   }
 };
 
+/**
+ * Verify user password (for sensitive operations like account deletion)
+ */
+export const verifyPassword = async (userId, password) => {
+  const result = await query(
+    "SELECT password_hash FROM users WHERE id = $1 AND is_active = true",
+    [userId],
+  );
+  if (result.rows.length === 0) throw new Error("User not found");
+  const valid = await bcrypt.compare(password, result.rows[0].password_hash);
+  if (!valid) throw new Error("Invalid password");
+  return true;
+};
+
+/**
+ * Permanently delete a user account and all associated data
+ * Returns { email, firstName, lastName } for post-deletion email
+ */
+export const deleteAccount = async (userId) => {
+  // Capture user info before deletion
+  const userResult = await query(
+    "SELECT email, first_name, last_name FROM users WHERE id = $1",
+    [userId],
+  );
+  if (userResult.rows.length === 0) throw new Error("User not found");
+  const { email, first_name: firstName, last_name: lastName } = userResult.rows[0];
+
+  // Cascade-delete all user data
+  await query("DELETE FROM refresh_tokens WHERE user_id = $1", [userId]);
+  await query("DELETE FROM email_verification_tokens WHERE user_id = $1", [userId]);
+  await query("DELETE FROM password_reset_tokens WHERE user_id = $1", [userId]);
+  await query("DELETE FROM watchlists WHERE user_id = $1", [userId]);
+  await query("DELETE FROM user_preferences WHERE user_id = $1", [userId]);
+  await query("DELETE FROM users WHERE id = $1", [userId]);
+
+  return { email, firstName, lastName };
+};
+
 export default {
   register,
   login,
@@ -471,4 +509,6 @@ export default {
   resetPassword,
   verifyEmail,
   resendEmailVerification,
+  verifyPassword,
+  deleteAccount,
 };
