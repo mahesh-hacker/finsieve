@@ -120,7 +120,7 @@ const PmsScreener = () => {
     (async () => {
       try {
         setLoading(true);
-        const resp = await screeningService.screenByAssetClass("PMS", undefined, undefined, 200);
+        const resp = await screeningService.screenByAssetClass("PMS", undefined, undefined, 500);
         const items = ((resp as unknown as { data: PmsRow[] }).data) || [];
         setData(items);
       } catch {

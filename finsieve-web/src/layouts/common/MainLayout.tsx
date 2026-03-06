@@ -861,36 +861,6 @@ const MainLayout = () => {
 
           {/* Right Actions */}
           <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-            {/* Live Indicator */}
-            <Box
-              sx={{
-                display: { xs: "none", md: "flex" },
-                alignItems: "center",
-                gap: 0.7,
-                mr: 1,
-                px: 1.2,
-                py: 0.4,
-                borderRadius: "6px",
-                bgcolor: isDark
-                  ? "rgba(16, 185, 129, 0.06)"
-                  : "rgba(16, 185, 129, 0.08)",
-                border: `1px solid ${isDark ? "rgba(16, 185, 129, 0.12)" : "rgba(16, 185, 129, 0.2)"}`,
-              }}
-            >
-              <span className="live-dot" />
-              <Typography
-                sx={{
-                  fontSize: "0.6rem",
-                  fontWeight: 700,
-                  color: "#10b981",
-                  letterSpacing: "0.05em",
-                  textTransform: "uppercase",
-                }}
-              >
-                LIVE
-              </Typography>
-            </Box>
-
             {/* Theme Toggle — authenticated users only */}
             {isAuthenticated && (
               <>

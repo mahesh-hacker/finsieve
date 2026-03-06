@@ -537,7 +537,7 @@ const LandingPage = () => {
       icon: <Notifications />,
       title: "Smart Watchlists",
       description:
-        "Create unlimited watchlists (Premium), add personal notes, and track all your favorites in real-time.",
+        "Create unlimited watchlists (Premium), add personal notes, and track all your favorites.",
       gradient: "linear-gradient(135deg, #ec4899, #db2777)",
       delay: "0.4s",
     },

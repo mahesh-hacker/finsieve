@@ -494,15 +494,11 @@ const News = () => {
       {/* Header */}
       <Box display="flex" alignItems="flex-start" justifyContent="space-between" mb={4} flexWrap="wrap" gap={2}>
         <Box>
-          <Box display="flex" alignItems="center" gap={1.5} mb={1}>
-            <Box className="live-dot" />
-            <Chip label="LIVE" size="small" sx={{ height: 20, fontSize: 10, fontWeight: 800, color: "#10b981", background: alpha("#10b981", 0.1), letterSpacing: 1 }} />
-          </Box>
           <Typography variant="h4" fontWeight={800} letterSpacing={-0.5} mb={0.5}>
             Market News
           </Typography>
           <Typography color="text.secondary">
-            Curated financial news from top sources, updated in real-time
+            Curated financial news from top sources, updated regularly
           </Typography>
         </Box>
         <Button startIcon={<Refresh />} variant="outlined" onClick={() => toast.success("News refreshed")} sx={{ borderRadius: 2 }}>

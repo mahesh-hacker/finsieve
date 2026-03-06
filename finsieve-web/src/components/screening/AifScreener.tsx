@@ -122,7 +122,7 @@ const AifScreener = () => {
     (async () => {
       try {
         setLoading(true);
-        const resp = await screeningService.screenByAssetClass("AIF", undefined, undefined, 200);
+        const resp = await screeningService.screenByAssetClass("AIF", undefined, undefined, 500);
         const items = ((resp as unknown as { data: AifRow[] }).data) || [];
         setData(items);
       } catch {

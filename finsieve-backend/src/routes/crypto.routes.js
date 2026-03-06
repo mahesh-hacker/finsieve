@@ -11,7 +11,7 @@ const router = express.Router();
 // ─── TOP CRYPTOS ───────────────────────────────────────────
 router.get("/", async (req, res) => {
   try {
-    const { limit = 200, currency = "usd" } = req.query;
+    const { limit = 500, currency = "usd" } = req.query;
     const cryptos = await cryptoService.getTopCryptos(
       parseInt(limit),
       currency,

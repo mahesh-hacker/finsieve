@@ -126,7 +126,7 @@ const SifScreener = () => {
     (async () => {
       try {
         setLoading(true);
-        const resp = await screeningService.screenByAssetClass("SIF", undefined, undefined, 200);
+        const resp = await screeningService.screenByAssetClass("SIF", undefined, undefined, 500);
         const items = ((resp as unknown as { data: SifRow[] }).data) || [];
         setData(items);
       } catch {

@@ -62,7 +62,7 @@ const Cryptocurrency = () => {
       else setIsRefreshing(true);
 
       const [cryptoRes, overviewRes, trendingRes] = await Promise.all([
-        cryptoService.getTopCryptos(200),
+        cryptoService.getTopCryptos(500),
         cryptoService.getMarketOverview(),
         cryptoService.getTrending(),
       ]);

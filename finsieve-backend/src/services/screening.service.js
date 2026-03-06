@@ -201,7 +201,7 @@ class ScreeningService {
           break;
         }
         case "CRYPTO": {
-          const cryptos = await cryptoService.getTopCryptos(100);
+          const cryptos = await cryptoService.getTopCryptos(500);
           data = cryptos.map((c) => ({ ...c, asset_class: "CRYPTO" }));
           break;
         }

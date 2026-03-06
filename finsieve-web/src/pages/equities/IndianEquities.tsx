@@ -332,20 +332,6 @@ const IndianEquities = () => {
             `${stocks.length} stocks`
           )}{" "}
           · {SECTORS.length} sectors
-          {liveDataAvailable && (
-            <Chip
-              label="Live"
-              size="small"
-              sx={{
-                ml: 1,
-                fontSize: 10,
-                height: 16,
-                bgcolor: alpha("#10b981", 0.12),
-                color: "#10b981",
-                fontWeight: 700,
-              }}
-            />
-          )}
         </Typography>
       </Box>
 

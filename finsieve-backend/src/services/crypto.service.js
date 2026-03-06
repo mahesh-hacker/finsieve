@@ -174,61 +174,79 @@ class CryptoService {
   }
 
   /**
+   * Map a single CoinGecko coin object to our format
+   */
+  _mapGeckoCoin(coin, vsCurrency) {
+    return {
+      id: coin.id,
+      symbol: coin.symbol.toUpperCase(),
+      name: coin.name,
+      image: coin.image,
+      current_value: coin.current_price,
+      market_cap: coin.market_cap,
+      market_cap_rank: coin.market_cap_rank,
+      total_volume: coin.total_volume,
+      change: coin.price_change_24h,
+      change_percent: coin.price_change_percentage_24h,
+      change_1h: coin.price_change_percentage_1h_in_currency,
+      change_7d: coin.price_change_percentage_7d_in_currency,
+      change_30d: coin.price_change_percentage_30d_in_currency,
+      circulating_supply: coin.circulating_supply,
+      total_supply: coin.total_supply,
+      max_supply: coin.max_supply,
+      ath: coin.ath,
+      ath_change_percent: coin.ath_change_percentage,
+      ath_date: coin.ath_date,
+      atl: coin.atl,
+      atl_change_percent: coin.atl_change_percentage,
+      atl_date: coin.atl_date,
+      high_24h: coin.high_24h,
+      low_24h: coin.low_24h,
+      sparkline_7d: coin.sparkline_in_7d?.price || [],
+      currency: vsCurrency.toUpperCase(),
+      last_updated: coin.last_updated,
+    };
+  }
+
+  /**
    * Get top cryptocurrencies by market cap
-   * @param {number} limit - Number of results (max 250)
+   * @param {number} limit - Number of results (up to 500 via multi-page)
    * @param {string} vsCurrency - Currency to compare (usd, inr, eur)
    */
   async getTopCryptos(limit = 50, vsCurrency = "usd") {
-    const cacheKey = `top_cryptos_${vsCurrency}_${limit}`;
+    const safeLimit = Math.min(Math.max(1, parseInt(limit, 10) || 50), 500);
+    const cacheKey = `top_cryptos_${vsCurrency}_${safeLimit}`;
     const cached = cache.get(cacheKey);
     if (cached) return cached;
 
-    // ── 1. Try CoinGecko ────────────────────────────────────
+    // ── 1. Try CoinGecko (multi-page when limit > 250) ─────
     try {
-      console.log(`💰 Fetching top ${limit} cryptos from CoinGecko...`);
-      const response = await axios.get(`${this.geckoURL}/coins/markets`, {
-        headers: this.geckoHeaders,
-        params: {
-          vs_currency: vsCurrency,
-          order: "market_cap_desc",
-          per_page: Math.min(limit, 250),
-          page: 1,
-          sparkline: true,
-          price_change_percentage: "1h,24h,7d,30d",
-        },
-        timeout: 10000,
-      });
+      console.log(`💰 Fetching top ${safeLimit} cryptos from CoinGecko...`);
+      const perPage = 250;
+      const pagesNeeded = Math.ceil(safeLimit / perPage);
+      let allCoins = [];
 
-      const cryptos = response.data.map((coin) => ({
-        id: coin.id,
-        symbol: coin.symbol.toUpperCase(),
-        name: coin.name,
-        image: coin.image,
-        current_value: coin.current_price,
-        market_cap: coin.market_cap,
-        market_cap_rank: coin.market_cap_rank,
-        total_volume: coin.total_volume,
-        change: coin.price_change_24h,
-        change_percent: coin.price_change_percentage_24h,
-        change_1h: coin.price_change_percentage_1h_in_currency,
-        change_7d: coin.price_change_percentage_7d_in_currency,
-        change_30d: coin.price_change_percentage_30d_in_currency,
-        circulating_supply: coin.circulating_supply,
-        total_supply: coin.total_supply,
-        max_supply: coin.max_supply,
-        ath: coin.ath,
-        ath_change_percent: coin.ath_change_percentage,
-        ath_date: coin.ath_date,
-        atl: coin.atl,
-        atl_change_percent: coin.atl_change_percentage,
-        atl_date: coin.atl_date,
-        high_24h: coin.high_24h,
-        low_24h: coin.low_24h,
-        sparkline_7d: coin.sparkline_in_7d?.price || [],
-        currency: vsCurrency.toUpperCase(),
-        last_updated: coin.last_updated,
-      }));
+      for (let page = 1; page <= pagesNeeded; page++) {
+        const response = await axios.get(`${this.geckoURL}/coins/markets`, {
+          headers: this.geckoHeaders,
+          params: {
+            vs_currency: vsCurrency,
+            order: "market_cap_desc",
+            per_page: perPage,
+            page,
+            sparkline: true,
+            price_change_percentage: "1h,24h,7d,30d",
+          },
+          timeout: 15000,
+        });
+        const mapped = (response.data || []).map((coin) =>
+          this._mapGeckoCoin(coin, vsCurrency),
+        );
+        allCoins = allCoins.concat(mapped);
+        if (mapped.length < perPage) break;
+      }
 
+      const cryptos = allCoins.slice(0, safeLimit);
       console.log(`✅ CoinGecko: fetched ${cryptos.length} cryptos`);
       cache.set(cacheKey, cryptos, 30);
       return cryptos;
@@ -238,7 +256,7 @@ class CryptoService {
 
     // ── 2. Try CoinPaprika ──────────────────────────────────
     try {
-      const cryptos = await this._fetchFromPaprika(limit);
+      const cryptos = await this._fetchFromPaprika(safeLimit);
       console.log(`✅ CoinPaprika: fetched ${cryptos.length} cryptos`);
       cache.set(cacheKey, cryptos, 60);
       return cryptos;
@@ -248,7 +266,7 @@ class CryptoService {
 
     // ── 3. Static fallback — page never goes blank ──────────
     console.log("📋 Serving static crypto fallback data");
-    const fallback = STATIC_CRYPTOS.slice(0, limit);
+    const fallback = STATIC_CRYPTOS.slice(0, safeLimit);
     cache.set(cacheKey, fallback, 120);
     return fallback;
   }
