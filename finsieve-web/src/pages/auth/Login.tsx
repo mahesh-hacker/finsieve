@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link as RouterLink } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../../store";
 import {
   Box,
   Card,
@@ -25,12 +26,20 @@ import {
 } from "@mui/icons-material";
 import toast from "react-hot-toast";
 import authService from "../../services/auth/authService";
-import { loginSuccess } from "../../store/slices/authSlice";
+import { loginSuccess, logout } from "../../store/slices/authSlice";
 
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
   const theme = useTheme();
+
+  // If user navigates back to login while authenticated, log them out
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(logout());
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);

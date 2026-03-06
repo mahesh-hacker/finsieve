@@ -187,7 +187,7 @@ const AifScreener = () => {
   return (
     <Box sx={{ pb: 3 }}>
       <Box sx={{ mb: 3 }}>
-        <Typography variant="h4" sx={{ fontWeight: 800 }}>AIF</Typography>
+        <Typography variant="h5" sx={{ fontWeight: 800, fontSize: { xs: 20, sm: 24 } }}>AIF</Typography>
         <Typography variant="body2" sx={{ color: "text.secondary", mt: 0.5 }}>
           Alternative Investment Funds · Min ₹1 Crore · {data.length} funds
         </Typography>
@@ -270,7 +270,7 @@ const AifScreener = () => {
         </Box>
       ) : view === "table" ? (
         <TableContainer component={Paper} elevation={0}
-          sx={{ border: `1px solid ${isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)"}`, borderRadius: 2 }}>
+          sx={{ border: `1px solid ${isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)"}`, borderRadius: 2, overflowX: "auto" }}>
           <Table size="small" stickyHeader>
             <TableHead>
               <TableRow sx={{ bgcolor: isDark ? "rgba(99,102,241,0.08)" : "rgba(99,102,241,0.05)" }}>

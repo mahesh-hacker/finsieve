@@ -141,9 +141,10 @@ const USEquities = () => {
       >
         <Box>
           <Typography
-            variant="h4"
+            variant="h5"
             sx={{
               fontWeight: 800,
+              fontSize: { xs: 18, sm: 22, md: 26 },
               display: "flex",
               alignItems: "center",
               gap: 1,
@@ -273,20 +274,22 @@ const USEquities = () => {
           gap: 1,
         }}
       >
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <Typography variant="h6" sx={{ fontWeight: 700 }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap", flex: 1 }}>
+          <Typography variant="h6" sx={{ fontWeight: 700, whiteSpace: "nowrap" }}>
             <ShowChart sx={{ mr: 1, verticalAlign: "middle" }} />
             Stocks
           </Typography>
           <Tabs
             value={activeTab}
             onChange={(_, v) => setActiveTab(v)}
-            sx={{ minHeight: 36 }}
+            variant="scrollable"
+            scrollButtons="auto"
+            sx={{ minHeight: 36, flex: 1 }}
           >
-            <Tab label="All" sx={{ minHeight: 36, py: 0 }} />
-            <Tab label="Top Gainers 🚀" sx={{ minHeight: 36, py: 0 }} />
-            <Tab label="Top Losers 📉" sx={{ minHeight: 36, py: 0 }} />
-            <Tab label="Most Active" sx={{ minHeight: 36, py: 0 }} />
+            <Tab label="All" sx={{ minHeight: 36, py: 0, fontSize: 12 }} />
+            <Tab label="Top Gainers" sx={{ minHeight: 36, py: 0, fontSize: 12 }} />
+            <Tab label="Top Losers" sx={{ minHeight: 36, py: 0, fontSize: 12 }} />
+            <Tab label="Most Active" sx={{ minHeight: 36, py: 0, fontSize: 12 }} />
           </Tabs>
         </Box>
         {activeTab === 0 && (
@@ -304,7 +307,7 @@ const USEquities = () => {
                 ),
               },
             }}
-            sx={{ width: 250 }}
+            sx={{ width: { xs: "100%", sm: 220 } }}
           />
         )}
       </Box>

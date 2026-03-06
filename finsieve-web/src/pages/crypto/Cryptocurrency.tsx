@@ -62,7 +62,7 @@ const Cryptocurrency = () => {
       else setIsRefreshing(true);
 
       const [cryptoRes, overviewRes, trendingRes] = await Promise.all([
-        cryptoService.getTopCryptos(50),
+        cryptoService.getTopCryptos(200),
         cryptoService.getMarketOverview(),
         cryptoService.getTrending(),
       ]);
@@ -142,9 +142,10 @@ const Cryptocurrency = () => {
       >
         <Box>
           <Typography
-            variant="h4"
+            variant="h5"
             sx={{
               fontWeight: 800,
+              fontSize: { xs: 18, sm: 22, md: 26 },
               display: "flex",
               alignItems: "center",
               gap: 1,
@@ -153,7 +154,7 @@ const Cryptocurrency = () => {
             ₿ Cryptocurrency
           </Typography>
           <Typography variant="body2" sx={{ color: "text.secondary", mt: 0.5 }}>
-            Top 50 by Market Cap • Powered by CoinGecko
+            Top 200 by Market Cap • Powered by CoinGecko
           </Typography>
         </Box>
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
@@ -366,7 +367,7 @@ const Cryptocurrency = () => {
         }}
       >
         <Typography variant="h6" sx={{ fontWeight: 700 }}>
-          Top 50 Cryptocurrencies
+          Top 200 Cryptocurrencies
         </Typography>
         <TextField
           size="small"
@@ -382,7 +383,7 @@ const Cryptocurrency = () => {
               ),
             },
           }}
-          sx={{ width: 250 }}
+          sx={{ width: { xs: "100%", sm: 220 } }}
         />
       </Box>
 

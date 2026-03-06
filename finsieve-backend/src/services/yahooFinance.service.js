@@ -350,36 +350,25 @@ class YahooFinanceService {
     // TOP US STOCKS (Blue-chips that people track daily)
     // ═══════════════════════════════════════════════════════
     this.topUSStocks = [
-      "AAPL",
-      "MSFT",
-      "GOOGL",
-      "AMZN",
-      "NVDA",
-      "META",
-      "TSLA",
-      "BRK-B",
-      "JPM",
-      "V",
-      "JNJ",
-      "UNH",
-      "MA",
-      "PG",
-      "HD",
-      "XOM",
-      "BAC",
-      "DIS",
-      "NFLX",
-      "AMD",
-      "CRM",
-      "INTC",
-      "CSCO",
-      "VZ",
-      "KO",
-      "PEP",
-      "MRK",
-      "ABBV",
-      "PFE",
-      "WMT",
+      // Mega-cap Tech
+      "AAPL","MSFT","GOOGL","AMZN","NVDA","META","TSLA","AVGO","ORCL","ADBE",
+      "QCOM","TXN","AMD","INTC","CSCO","IBM","NOW","INTU","PANW","AMAT",
+      // Financial
+      "BRK-B","JPM","V","MA","BAC","WFC","GS","MS","AXP","BLK",
+      "SCHW","USB","PNC","TFC","COF","SPGI","MCO","ICE","CME","CB",
+      // Healthcare
+      "JNJ","UNH","LLY","MRK","ABBV","PFE","TMO","ABT","DHR","BMY",
+      "AMGN","GILD","SYK","BDX","MDT","EW","REGN","VRTX","ISRG","HUM",
+      // Consumer
+      "WMT","PG","KO","PEP","COST","HD","MCD","NKE","SBUX","TGT",
+      "LOW","CL","EL","PM","MO","KHC","GIS","HSY","K","SJM",
+      // Energy & Industrials
+      "XOM","CVX","COP","EOG","SLB","LIN","HON","UPS","GE","CAT",
+      "DE","BA","RTX","LMT","NOC","EMR","ETN","ITW","PH","ROK",
+      // Communication & Media
+      "NFLX","DIS","CMCSA","VZ","T","PARA","WBD","FOXA","EA","TTWO",
+      // Real Estate & Utilities
+      "AMT","PLD","CCI","EQIX","NEE","DUK","SO","D","AEP","SRE",
     ];
   }
 

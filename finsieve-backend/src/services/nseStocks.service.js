@@ -5,6 +5,9 @@
  */
 
 import axios from "axios";
+import NodeCache from "node-cache";
+
+const cache = new NodeCache({ stdTTL: 300, checkperiod: 60 });
 
 class NSEStocksService {
   constructor() {
@@ -57,32 +60,99 @@ class NSEStocksService {
   }
 
   /**
-   * Fetch all equity stocks from NSE
+   * Fetch equity stocks from NSE — tries NIFTY TOTAL MARKET (750+) first,
+   * falls back to F&O securities (~250), then NSE equity CSV (~1500+).
    */
   async getAllNSEStocks() {
-    try {
-      await this.initSession();
+    const cacheKey = "nse_all_stocks";
+    const cached = cache.get(cacheKey);
+    if (cached) return cached;
 
-      const response = await axios.get(
-        `${this.baseURL}/equity-stockIndices?index=SECURITIES%20IN%20F%26O`,
-        {
-          headers: {
-            ...this.headers,
-            Cookie: this.sessionCookies ? this.sessionCookies.join("; ") : "",
-          },
-          timeout: 15000,
-        },
-      );
+    await this.initSession();
+    const cookieHeader = this.sessionCookies ? this.sessionCookies.join("; ") : "";
 
-      if (!response.data || !response.data.data) {
-        throw new Error("Invalid response from NSE API");
+    // Try indices in order of comprehensiveness
+    const indices = [
+      "NIFTY%20TOTAL%20MARKET",
+      "NIFTY%20500",
+      "SECURITIES%20IN%20F%26O",
+    ];
+
+    for (const index of indices) {
+      try {
+        const response = await axios.get(
+          `${this.baseURL}/equity-stockIndices?index=${index}`,
+          { headers: { ...this.headers, Cookie: cookieHeader }, timeout: 15000 },
+        );
+        if (response.data?.data?.length > 0) {
+          const stocks = this.formatStockData(response.data.data);
+          console.log(`✅ NSE stocks: ${stocks.length} via ${decodeURIComponent(index)}`);
+          cache.set(cacheKey, stocks, 300);
+          return stocks;
+        }
+      } catch (e) {
+        console.warn(`⚠️ NSE index ${index} failed: ${e.message}`);
       }
-
-      return this.formatStockData(response.data.data);
-    } catch (error) {
-      console.error("❌ Error fetching NSE stocks:", error.message);
-      throw error;
     }
+
+    // Last resort: NSE equity listing CSV (all ~1500+ EQ series stocks, no price)
+    try {
+      const csv = await axios.get(
+        "https://nsearchives.nseindia.com/content/equities/EQUITY_L.csv",
+        { headers: this.headers, timeout: 20000, responseType: "text" },
+      );
+      const stocks = this.parseEquityCSV(csv.data);
+      console.log(`✅ NSE stocks: ${stocks.length} via CSV fallback`);
+      cache.set(cacheKey, stocks, 86400); // CSV is stable — cache 24h
+      return stocks;
+    } catch (e) {
+      console.error("❌ NSE CSV fallback failed:", e.message);
+      throw new Error("Failed to fetch NSE stocks from all sources");
+    }
+  }
+
+  /**
+   * Parse NSE EQUITY_L.csv into stock objects (no live prices).
+   * Format: SYMBOL,NAME OF COMPANY,SERIES,DATE OF LISTING,...,ISIN NUMBER,...
+   */
+  parseEquityCSV(csvText) {
+    const lines = csvText.split("\n").slice(1); // skip header
+    const stocks = [];
+    for (const line of lines) {
+      if (!line.trim()) continue;
+      // Handle quoted names with commas
+      const parts = [];
+      let current = "";
+      let inQuote = false;
+      for (const ch of line) {
+        if (ch === '"') { inQuote = !inQuote; }
+        else if (ch === "," && !inQuote) { parts.push(current.trim()); current = ""; }
+        else { current += ch; }
+      }
+      parts.push(current.trim());
+
+      const symbol = parts[0]?.trim();
+      const name = parts[1]?.trim();
+      const series = parts[2]?.trim();
+      if (!symbol || !name || series !== "EQ") continue;
+      stocks.push({
+        symbol,
+        companyName: name,
+        lastPrice: 0,
+        change: 0,
+        pChange: 0,
+        volume: 0,
+        marketCap: 0,
+        pe: 0,
+        yearHigh: 0,
+        yearLow: 0,
+        open: 0,
+        dayHigh: 0,
+        dayLow: 0,
+        previousClose: 0,
+      });
+    }
+    return stocks;
   }
 
   /**
