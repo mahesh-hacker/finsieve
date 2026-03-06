@@ -199,7 +199,7 @@ const LiveTicker = () => {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
   const { user } = useSelector((state: RootState) => state.auth);
-  const { indices: liveIndices } = useRealTimeIndices("all", user?.userTier);
+  const { indices: liveIndices } = useRealTimeIndices("all");
   const [fallbackIndices, setFallbackIndices] = useState<GlobalIndex[]>([]);
 
   const fetchTicker = useCallback(async () => {

@@ -244,11 +244,8 @@ const startServer = async () => {
       marketDataBroadcaster.attach(server, "/ws/market");
       console.log("✅ Market Data WebSocket broadcaster attached");
 
-      // When any Premium/Enterprise client connects, speed up NSE updates to 1s (indices + stocks)
-      marketDataBroadcaster.setOnTierChangeCallback((hasPremiumOrEnterprise) => {
-        nseDataScheduler.setUpdateFrequency(hasPremiumOrEnterprise ? 1000 : 5000);
-        nseStocksScheduler.setUpdateFrequency(hasPremiumOrEnterprise ? 1000 : 8000);
-      });
+      // All users get the same live update frequency (no tier gating)
+      // NSE indices: 5s, NSE stocks: 8s — real-time for everyone
 
       // ============================================
       // START ALL SCHEDULERS

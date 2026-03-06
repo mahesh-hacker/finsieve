@@ -84,7 +84,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
 
-  const { indices: liveIndices, lastUpdate: liveUpdate } = useRealTimeIndices("all", user?.userTier);
+  const { indices: liveIndices, lastUpdate: liveUpdate } = useRealTimeIndices("all");
 
   const fetchIndices = useCallback(async (isInitialLoad = false) => {
     try {
