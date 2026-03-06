@@ -61,6 +61,7 @@ import { useThemeMode, type ThemeMode } from "../../contexts/ThemeContext";
 import GlobalSearch from "../../components/common/GlobalSearch";
 import InvestBot from "../../components/chatbot/InvestBot";
 import { useRealTimeIndices } from "../../hooks/useRealTimeIndices";
+import { useInactivityLogout } from "../../hooks/useInactivityLogout";
 import marketService, {
   GlobalIndex,
 } from "../../services/market/marketService";
@@ -114,24 +115,6 @@ const navSections = [
         requiresAuth: false,
       },
       {
-        text: "Commodities",
-        icon: <Diamond sx={{ fontSize: 20 }} />,
-        path: "/commodities",
-        requiresAuth: false,
-      },
-      {
-        text: "Bonds",
-        icon: <WaterDrop sx={{ fontSize: 20 }} />,
-        path: "/bonds",
-        requiresAuth: false,
-      },
-      {
-        text: "Cryptocurrency",
-        icon: <CryptoCurrencyIcon sx={{ fontSize: 20 }} />,
-        path: "/crypto",
-        requiresAuth: false,
-      },
-      {
         text: "ETFs",
         icon: <Assessment sx={{ fontSize: 20 }} />,
         path: "/screening/etf",
@@ -153,6 +136,24 @@ const navSections = [
         text: "AIF",
         icon: <CorporateFare sx={{ fontSize: 20 }} />,
         path: "/screening/aif",
+        requiresAuth: false,
+      },
+      {
+        text: "Commodities",
+        icon: <Diamond sx={{ fontSize: 20 }} />,
+        path: "/commodities",
+        requiresAuth: false,
+      },
+      {
+        text: "Bonds",
+        icon: <WaterDrop sx={{ fontSize: 20 }} />,
+        path: "/bonds",
+        requiresAuth: false,
+      },
+      {
+        text: "Cryptocurrency",
+        icon: <CryptoCurrencyIcon sx={{ fontSize: 20 }} />,
+        path: "/crypto",
         requiresAuth: false,
       },
     ],
@@ -362,6 +363,9 @@ const MainLayout = () => {
     (state: RootState) => state.auth,
   );
   const { themeMode, setThemeMode } = useThemeMode();
+
+  // Auto-logout after 2 hours of inactivity
+  useInactivityLogout();
 
   // Persist sidebar state
   const toggleSidebar = () => {
