@@ -42,16 +42,16 @@ type EtfRow = {
   category: string;
   aum_cr: number;
   ter: number;
-  price: number;
-  ret1y: number;
-  ret3y: number;
-  ret5y: number;
+  current_value: number;
+  return_1y: number;
+  return_3y: number;
+  return_5y: number;
   tracking_error: number;
   dividend_yield: number;
   launch_year: number;
 };
 
-type SortField = "name" | "aum_cr" | "ter" | "ret1y" | "ret3y" | "ret5y" | "tracking_error";
+type SortField = "name" | "aum_cr" | "ter" | "return_1y" | "return_3y" | "return_5y" | "tracking_error";
 type SortDir = "asc" | "desc";
 type View = "table" | "grid";
 
@@ -80,7 +80,7 @@ function retColor(v: number | undefined): { value: string; color: string } | str
 function exportCSV(rows: EtfRow[]) {
   const header = "Symbol,Name,Category,AUM (Cr),TER (%),Price,1Y Ret (%),3Y Ret (%),5Y Ret (%),Tracking Error (%),Launch Year\n";
   const body = rows
-    .map((r) => `${r.symbol},"${r.name}",${r.category},${r.aum_cr},${r.ter},${r.price},${r.ret1y},${r.ret3y},${r.ret5y},${r.tracking_error},${r.launch_year}`)
+    .map((r) => `${r.symbol},"${r.name}",${r.category},${r.aum_cr},${r.ter},${r.current_value},${r.return_1y},${r.return_3y},${r.return_5y},${r.tracking_error},${r.launch_year}`)
     .join("\n");
   const blob = new Blob([header + body], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
@@ -107,7 +107,7 @@ const EtfScreener = () => {
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All");
-  const [sortField, setSortField] = useState<SortField>("aum_cr");
+  const [sortField, setSortField] = useState<SortField>("return_1y");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [view, setView] = useState<View>("table");
 
@@ -272,9 +272,9 @@ const EtfScreener = () => {
                 <TableCell sx={{ fontWeight: 700, fontSize: 12, color: "#6366f1" }}>Category</TableCell>
                 <SortableHeader field="aum_cr" label="AUM (Cr)" />
                 <SortableHeader field="ter" label="TER %" />
-                <SortableHeader field="ret1y" label="1Y Ret" />
-                <SortableHeader field="ret3y" label="3Y Ret" />
-                <SortableHeader field="ret5y" label="5Y Ret" />
+                <SortableHeader field="return_1y" label="1Y Ret" />
+                <SortableHeader field="return_3y" label="3Y Ret" />
+                <SortableHeader field="return_5y" label="5Y Ret" />
                 <SortableHeader field="tracking_error" label="Track Err" />
               </TableRow>
             </TableHead>
@@ -282,9 +282,9 @@ const EtfScreener = () => {
               {filtered.map((etf, idx) => {
                 const catKey = getCatKey(etf.category);
                 const catColor = CAT_COLORS[catKey] ?? "#6366f1";
-                const r1 = retColor(etf.ret1y);
-                const r3 = retColor(etf.ret3y);
-                const r5 = retColor(etf.ret5y);
+                const r1 = retColor(etf.return_1y);
+                const r3 = retColor(etf.return_3y);
+                const r5 = retColor(etf.return_5y);
                 return (
                   <TableRow key={etf.symbol} hover sx={{ "&:last-child td": { border: 0 } }}>
                     <TableCell sx={{ fontSize: 12, color: "text.secondary" }}>{idx + 1}</TableCell>
@@ -325,7 +325,7 @@ const EtfScreener = () => {
           {filtered.map((etf) => {
             const catKey = getCatKey(etf.category);
             const catColor = CAT_COLORS[catKey] ?? "#6366f1";
-            const r1 = retColor(etf.ret1y);
+            const r1 = retColor(etf.return_1y);
             return (
               <Paper key={etf.symbol} elevation={0} sx={{
                 p: 2, borderRadius: 2,
@@ -363,6 +363,12 @@ const EtfScreener = () => {
                   <Box>
                     <Typography sx={{ fontSize: 10, color: "text.secondary" }}>Tracking Err</Typography>
                     <Typography sx={{ fontSize: 12, fontWeight: 600 }}>{fmt(etf.tracking_error, 2, "%")}</Typography>
+                  </Box>
+                  <Box>
+                    <Typography sx={{ fontSize: 10, color: "text.secondary" }}>3Y Return</Typography>
+                    <Typography sx={{ fontSize: 12, fontWeight: 600, color: typeof retColor(etf.return_3y) === "object" ? (retColor(etf.return_3y) as {color:string}).color : "inherit" }}>
+                      {typeof retColor(etf.return_3y) === "object" ? (retColor(etf.return_3y) as {value:string}).value : retColor(etf.return_3y)}
+                    </Typography>
                   </Box>
                 </Box>
                 <Typography sx={{ fontSize: 10, color: "text.secondary", mt: 1 }}>Est. {etf.launch_year}</Typography>

@@ -406,68 +406,101 @@ class ScreeningService {
 
   /** Stub SIF data (Specialized Investment Funds — SEBI category; replace with SIF360 API when available) */
   async getStubSIF() {
+    // strategy_type values map to SIF_STRATEGIES in SifScreener: "Multi-Asset","Long Short","Quantitative","Sector"
+    const BENCHMARK_1Y = 14.2; // Nifty 50 approx 1Y return
+    const BENCHMARK_3Y = 13.1; // Nifty 50 approx 3Y CAGR
     const list = [
-      { name: "SBI Magnum Multi Cap SIF",       strategy_type: "Sector Rotation", risk_band: "3", redemption_days: 10,  alpha_3y: 4.2,  max_drawdown: -12.4, exit_load: 1.0,  aum_cr: 1200,  min_investment_lakh: 10 },
-      { name: "Quant qSIF Long-Short",           strategy_type: "Long-Short",      risk_band: "4", redemption_days: 30,  alpha_3y: 6.1,  max_drawdown: -18.2, exit_load: 0.0,  aum_cr: 450,   min_investment_lakh: 10 },
-      { name: "Edelweiss Altiva Multi-Asset",    strategy_type: "Multi-Asset",     risk_band: "2", redemption_days: 7,   alpha_3y: 3.8,  max_drawdown: -8.0,  exit_load: 0.5,  aum_cr: 800,   min_investment_lakh: 10 },
-      { name: "Nippon India SIF Quant",          strategy_type: "Quant",           risk_band: "4", redemption_days: 21,  alpha_3y: 5.4,  max_drawdown: -16.1, exit_load: 0.0,  aum_cr: 620,   min_investment_lakh: 10 },
-      { name: "HDFC Flexi SIF",                  strategy_type: "Sector Rotation", risk_band: "3", redemption_days: 10,  alpha_3y: 4.8,  max_drawdown: -13.2, exit_load: 0.5,  aum_cr: 980,   min_investment_lakh: 10 },
-      { name: "Mirae Asset SIF Long-Short",      strategy_type: "Long-Short",      risk_band: "5", redemption_days: 45,  alpha_3y: 7.2,  max_drawdown: -22.4, exit_load: 0.0,  aum_cr: 340,   min_investment_lakh: 10 },
-      { name: "Kotak Multi-Factor SIF",          strategy_type: "Quant",           risk_band: "3", redemption_days: 15,  alpha_3y: 4.4,  max_drawdown: -11.8, exit_load: 1.0,  aum_cr: 560,   min_investment_lakh: 10 },
-      { name: "ICICI Pru Sector Rotation SIF",   strategy_type: "Sector Rotation", risk_band: "3", redemption_days: 10,  alpha_3y: 5.1,  max_drawdown: -14.6, exit_load: 0.5,  aum_cr: 740,   min_investment_lakh: 10 },
-      { name: "Axis Multi-Asset SIF",            strategy_type: "Multi-Asset",     risk_band: "2", redemption_days: 5,   alpha_3y: 3.2,  max_drawdown: -7.4,  exit_load: 0.5,  aum_cr: 1100,  min_investment_lakh: 10 },
-      { name: "DSP Quant SIF",                   strategy_type: "Quant",           risk_band: "4", redemption_days: 21,  alpha_3y: 5.8,  max_drawdown: -17.2, exit_load: 0.0,  aum_cr: 280,   min_investment_lakh: 10 },
-      { name: "Franklin India Long-Short SIF",   strategy_type: "Long-Short",      risk_band: "4", redemption_days: 30,  alpha_3y: 5.6,  max_drawdown: -15.8, exit_load: 1.0,  aum_cr: 420,   min_investment_lakh: 10 },
-      { name: "Aditya Birla SL Flexicap SIF",    strategy_type: "Multi-Asset",     risk_band: "2", redemption_days: 7,   alpha_3y: 3.6,  max_drawdown: -9.2,  exit_load: 0.5,  aum_cr: 890,   min_investment_lakh: 10 },
-      { name: "UTI Alpha Momentum SIF",          strategy_type: "Quant",           risk_band: "5", redemption_days: 30,  alpha_3y: 8.1,  max_drawdown: -24.1, exit_load: 0.0,  aum_cr: 180,   min_investment_lakh: 10 },
-      { name: "Tata Low Volatility SIF",         strategy_type: "Quant",           risk_band: "1", redemption_days: 5,   alpha_3y: 2.4,  max_drawdown: -5.8,  exit_load: 0.5,  aum_cr: 650,   min_investment_lakh: 10 },
-      { name: "Sundaram Market Neutral SIF",     strategy_type: "Long-Short",      risk_band: "3", redemption_days: 15,  alpha_3y: 4.6,  max_drawdown: -10.4, exit_load: 0.0,  aum_cr: 320,   min_investment_lakh: 10 },
+      { name: "SBI Magnum Multi Cap SIF",        fund_house: "SBI Mutual Fund",      strategy: "Sector",           risk_band: "Moderately High", strategy_type: "Sector Rotation", redemption_days: 10,  alpha_3y: 4.2,  max_drawdown: -12.4, exit_load: 1.0,  aum_cr: 1200,  min_investment_lakh: 10, sharpe: 1.18 },
+      { name: "Quant qSIF Long Short",           fund_house: "Quant Mutual Fund",    strategy: "Long Short",       risk_band: "High",             strategy_type: "Long-Short",      redemption_days: 30,  alpha_3y: 6.1,  max_drawdown: -18.2, exit_load: 0.0,  aum_cr: 450,   min_investment_lakh: 10, sharpe: 1.42 },
+      { name: "Edelweiss Altiva Multi-Asset",    fund_house: "Edelweiss MF",         strategy: "Multi-Asset",      risk_band: "Moderate",         strategy_type: "Multi-Asset",     redemption_days: 7,   alpha_3y: 3.8,  max_drawdown: -8.0,  exit_load: 0.5,  aum_cr: 800,   min_investment_lakh: 10, sharpe: 1.05 },
+      { name: "Nippon India SIF Quantitative",   fund_house: "Nippon India MF",      strategy: "Quantitative",     risk_band: "High",             strategy_type: "Quant",           redemption_days: 21,  alpha_3y: 5.4,  max_drawdown: -16.1, exit_load: 0.0,  aum_cr: 620,   min_investment_lakh: 10, sharpe: 1.32 },
+      { name: "HDFC Flexi SIF",                  fund_house: "HDFC Mutual Fund",     strategy: "Sector",           risk_band: "Moderately High",  strategy_type: "Sector Rotation", redemption_days: 10,  alpha_3y: 4.8,  max_drawdown: -13.2, exit_load: 0.5,  aum_cr: 980,   min_investment_lakh: 10, sharpe: 1.24 },
+      { name: "Mirae Asset SIF Long Short",      fund_house: "Mirae Asset MF",       strategy: "Long Short",       risk_band: "High",             strategy_type: "Long-Short",      redemption_days: 45,  alpha_3y: 7.2,  max_drawdown: -22.4, exit_load: 0.0,  aum_cr: 340,   min_investment_lakh: 10, sharpe: 1.52 },
+      { name: "Kotak Multi-Factor SIF",          fund_house: "Kotak Mutual Fund",    strategy: "Quantitative",     risk_band: "Moderately High",  strategy_type: "Quant",           redemption_days: 15,  alpha_3y: 4.4,  max_drawdown: -11.8, exit_load: 1.0,  aum_cr: 560,   min_investment_lakh: 10, sharpe: 1.20 },
+      { name: "ICICI Pru Sector Rotation SIF",   fund_house: "ICICI Prudential MF",  strategy: "Sector",           risk_band: "Moderately High",  strategy_type: "Sector Rotation", redemption_days: 10,  alpha_3y: 5.1,  max_drawdown: -14.6, exit_load: 0.5,  aum_cr: 740,   min_investment_lakh: 10, sharpe: 1.30 },
+      { name: "Axis Multi-Asset SIF",            fund_house: "Axis Mutual Fund",     strategy: "Multi-Asset",      risk_band: "Moderate",         strategy_type: "Multi-Asset",     redemption_days: 5,   alpha_3y: 3.2,  max_drawdown: -7.4,  exit_load: 0.5,  aum_cr: 1100,  min_investment_lakh: 10, sharpe: 0.98 },
+      { name: "DSP Quantitative SIF",            fund_house: "DSP Mutual Fund",      strategy: "Quantitative",     risk_band: "High",             strategy_type: "Quant",           redemption_days: 21,  alpha_3y: 5.8,  max_drawdown: -17.2, exit_load: 0.0,  aum_cr: 280,   min_investment_lakh: 10, sharpe: 1.38 },
+      { name: "Franklin India Long Short SIF",   fund_house: "Franklin Templeton MF", strategy: "Long Short",      risk_band: "High",             strategy_type: "Long-Short",      redemption_days: 30,  alpha_3y: 5.6,  max_drawdown: -15.8, exit_load: 1.0,  aum_cr: 420,   min_investment_lakh: 10, sharpe: 1.35 },
+      { name: "Aditya Birla SL Flexicap SIF",    fund_house: "Aditya Birla Sun Life", strategy: "Multi-Asset",    risk_band: "Moderate",         strategy_type: "Multi-Asset",     redemption_days: 7,   alpha_3y: 3.6,  max_drawdown: -9.2,  exit_load: 0.5,  aum_cr: 890,   min_investment_lakh: 10, sharpe: 1.02 },
+      { name: "UTI Alpha Momentum SIF",          fund_house: "UTI Mutual Fund",      strategy: "Quantitative",     risk_band: "High",             strategy_type: "Quant",           redemption_days: 30,  alpha_3y: 8.1,  max_drawdown: -24.1, exit_load: 0.0,  aum_cr: 180,   min_investment_lakh: 10, sharpe: 1.65 },
+      { name: "Tata Low Volatility SIF",         fund_house: "Tata Mutual Fund",     strategy: "Quantitative",     risk_band: "Low",              strategy_type: "Quant",           redemption_days: 5,   alpha_3y: 2.4,  max_drawdown: -5.8,  exit_load: 0.5,  aum_cr: 650,   min_investment_lakh: 10, sharpe: 0.85 },
+      { name: "Sundaram Market Neutral SIF",     fund_house: "Sundaram Mutual Fund", strategy: "Long Short",       risk_band: "Moderately High",  strategy_type: "Long-Short",      redemption_days: 15,  alpha_3y: 4.6,  max_drawdown: -10.4, exit_load: 0.0,  aum_cr: 320,   min_investment_lakh: 10, sharpe: 1.22 },
     ];
-    return list.map((r) => ({ ...r, asset_class: "SIF" }));
+    return list.map((r) => ({
+      ...r,
+      asset_class: "SIF",
+      // Computed aliases for frontend
+      alpha: r.alpha_3y,
+      min_investment: r.min_investment_lakh,
+      redemption: `${r.redemption_days} days`,
+      returns_1y: parseFloat((BENCHMARK_1Y + r.alpha_3y * 0.7).toFixed(1)),
+      returns_3y: parseFloat((BENCHMARK_3Y + r.alpha_3y).toFixed(1)),
+    }));
   }
 
   /** Stub PMS data (Portfolio Management Services; replace with PMSBazaar / PrimeDatabase API when available) */
   async getStubPMS() {
+    const BENCHMARK_1Y = 14.2;
+    const BENCHMARK_3Y = 13.1;
     const list = [
-      { name: "Motilal Oswal India Opportunity PMS",       aum_cr: 12000, alpha_3y: 5.2,  sharpe_ratio: 1.42, max_drawdown: -14.2, irr_inception: 14.8, client_count: 450, manager_exp_years: 15, min_investment_lakh: 50 },
-      { name: "ICICI Prudential Dynamic PMS",              aum_cr: 8500,  alpha_3y: 4.1,  sharpe_ratio: 1.18, max_drawdown: -12.4, irr_inception: 12.1, client_count: 320, manager_exp_years: 12, min_investment_lakh: 50 },
-      { name: "HDFC AMC PMS Growth Opportunities",         aum_cr: 9500,  alpha_3y: 4.8,  sharpe_ratio: 1.35, max_drawdown: -11.8, irr_inception: 13.4, client_count: 380, manager_exp_years: 18, min_investment_lakh: 50 },
-      { name: "Kotak PMS India Value",                     aum_cr: 6200,  alpha_3y: 5.8,  sharpe_ratio: 1.52, max_drawdown: -16.4, irr_inception: 15.2, client_count: 280, manager_exp_years: 14, min_investment_lakh: 50 },
-      { name: "Axis Securities PMS Bluechip",              aum_cr: 4800,  alpha_3y: 4.2,  sharpe_ratio: 1.28, max_drawdown: -11.2, irr_inception: 12.8, client_count: 210, manager_exp_years: 11, min_investment_lakh: 50 },
-      { name: "Nippon India PMS Multi Asset",              aum_cr: 3200,  alpha_3y: 3.8,  sharpe_ratio: 1.14, max_drawdown: -9.8,  irr_inception: 11.6, client_count: 180, manager_exp_years: 16, min_investment_lakh: 50 },
-      { name: "SBI Funds Mgmt PMS Quant",                  aum_cr: 7100,  alpha_3y: 5.4,  sharpe_ratio: 1.46, max_drawdown: -13.8, irr_inception: 14.1, client_count: 320, manager_exp_years: 20, min_investment_lakh: 50 },
-      { name: "ASK Investment Managers Growth",            aum_cr: 14500, alpha_3y: 6.2,  sharpe_ratio: 1.64, max_drawdown: -15.2, irr_inception: 16.4, client_count: 680, manager_exp_years: 22, min_investment_lakh: 50 },
-      { name: "Ambit Capital PMS",                         aum_cr: 4200,  alpha_3y: 4.6,  sharpe_ratio: 1.32, max_drawdown: -12.8, irr_inception: 13.1, client_count: 240, manager_exp_years: 14, min_investment_lakh: 50 },
-      { name: "Carnelian Capital PMS",                     aum_cr: 2800,  alpha_3y: 7.1,  sharpe_ratio: 1.72, max_drawdown: -18.4, irr_inception: 17.8, client_count: 120, manager_exp_years: 12, min_investment_lakh: 50 },
-      { name: "Marcellus Investment Consistent Compounder", aum_cr: 6800,  alpha_3y: 5.8,  sharpe_ratio: 1.56, max_drawdown: -10.2, irr_inception: 15.4, client_count: 340, manager_exp_years: 16, min_investment_lakh: 50 },
-      { name: "Mirae Asset PMS India Leaders",             aum_cr: 3400,  alpha_3y: 4.4,  sharpe_ratio: 1.24, max_drawdown: -12.1, irr_inception: 12.6, client_count: 155, manager_exp_years: 10, min_investment_lakh: 50 },
-      { name: "Tata Asset Mgmt PMS",                       aum_cr: 5200,  alpha_3y: 4.1,  sharpe_ratio: 1.20, max_drawdown: -11.6, irr_inception: 12.4, client_count: 260, manager_exp_years: 14, min_investment_lakh: 50 },
-      { name: "Alchemy Capital PMS",                       aum_cr: 3800,  alpha_3y: 6.4,  sharpe_ratio: 1.58, max_drawdown: -14.8, irr_inception: 16.1, client_count: 190, manager_exp_years: 18, min_investment_lakh: 50 },
-      { name: "Emkay Investment Managers PMS",             aum_cr: 2100,  alpha_3y: 5.2,  sharpe_ratio: 1.38, max_drawdown: -13.4, irr_inception: 14.0, client_count: 110, manager_exp_years: 11, min_investment_lakh: 50 },
+      { name: "Motilal Oswal India Opportunity PMS",        manager: "Motilal Oswal AMC",        strategy: "Multi-Cap",       aum_cr: 12000, alpha_3y: 5.2,  sharpe_ratio: 1.42, max_drawdown: -14.2, irr_inception: 14.8, client_count: 450, manager_exp_years: 15, min_investment_lakh: 50 },
+      { name: "ICICI Prudential Dynamic PMS",               manager: "ICICI Prudential AMC",     strategy: "Growth",          aum_cr: 8500,  alpha_3y: 4.1,  sharpe_ratio: 1.18, max_drawdown: -12.4, irr_inception: 12.1, client_count: 320, manager_exp_years: 12, min_investment_lakh: 50 },
+      { name: "HDFC AMC PMS Growth Opportunities",          manager: "HDFC AMC",                 strategy: "Growth",          aum_cr: 9500,  alpha_3y: 4.8,  sharpe_ratio: 1.35, max_drawdown: -11.8, irr_inception: 13.4, client_count: 380, manager_exp_years: 18, min_investment_lakh: 50 },
+      { name: "Kotak PMS India Value",                      manager: "Kotak Securities",         strategy: "Value",           aum_cr: 6200,  alpha_3y: 5.8,  sharpe_ratio: 1.52, max_drawdown: -16.4, irr_inception: 15.2, client_count: 280, manager_exp_years: 14, min_investment_lakh: 50 },
+      { name: "Axis Securities PMS Bluechip",               manager: "Axis Securities",          strategy: "Growth",          aum_cr: 4800,  alpha_3y: 4.2,  sharpe_ratio: 1.28, max_drawdown: -11.2, irr_inception: 12.8, client_count: 210, manager_exp_years: 11, min_investment_lakh: 50 },
+      { name: "Nippon India PMS Multi Asset",               manager: "Nippon India AMC",         strategy: "Multi-Cap",       aum_cr: 3200,  alpha_3y: 3.8,  sharpe_ratio: 1.14, max_drawdown: -9.8,  irr_inception: 11.6, client_count: 180, manager_exp_years: 16, min_investment_lakh: 50 },
+      { name: "SBI Funds Management PMS Quant",             manager: "SBI Funds Management",     strategy: "Quant",           aum_cr: 7100,  alpha_3y: 5.4,  sharpe_ratio: 1.46, max_drawdown: -13.8, irr_inception: 14.1, client_count: 320, manager_exp_years: 20, min_investment_lakh: 50 },
+      { name: "ASK Investment Managers Growth",             manager: "ASK Investment Managers",  strategy: "Growth",          aum_cr: 14500, alpha_3y: 6.2,  sharpe_ratio: 1.64, max_drawdown: -15.2, irr_inception: 16.4, client_count: 680, manager_exp_years: 22, min_investment_lakh: 50 },
+      { name: "Ambit Capital PMS",                          manager: "Ambit Capital",            strategy: "Value",           aum_cr: 4200,  alpha_3y: 4.6,  sharpe_ratio: 1.32, max_drawdown: -12.8, irr_inception: 13.1, client_count: 240, manager_exp_years: 14, min_investment_lakh: 50 },
+      { name: "Carnelian Capital PMS",                      manager: "Carnelian Capital",        strategy: "Mid & Small Cap", aum_cr: 2800,  alpha_3y: 7.1,  sharpe_ratio: 1.72, max_drawdown: -18.4, irr_inception: 17.8, client_count: 120, manager_exp_years: 12, min_investment_lakh: 50 },
+      { name: "Marcellus Investment Consistent Compounder", manager: "Marcellus Investment",     strategy: "Growth",          aum_cr: 6800,  alpha_3y: 5.8,  sharpe_ratio: 1.56, max_drawdown: -10.2, irr_inception: 15.4, client_count: 340, manager_exp_years: 16, min_investment_lakh: 50 },
+      { name: "Mirae Asset PMS India Leaders",              manager: "Mirae Asset Investment",   strategy: "Multi-Cap",       aum_cr: 3400,  alpha_3y: 4.4,  sharpe_ratio: 1.24, max_drawdown: -12.1, irr_inception: 12.6, client_count: 155, manager_exp_years: 10, min_investment_lakh: 50 },
+      { name: "Tata Asset Management PMS",                  manager: "Tata Asset Management",    strategy: "Growth",          aum_cr: 5200,  alpha_3y: 4.1,  sharpe_ratio: 1.20, max_drawdown: -11.6, irr_inception: 12.4, client_count: 260, manager_exp_years: 14, min_investment_lakh: 50 },
+      { name: "Alchemy Capital PMS",                        manager: "Alchemy Capital",          strategy: "Contra",          aum_cr: 3800,  alpha_3y: 6.4,  sharpe_ratio: 1.58, max_drawdown: -14.8, irr_inception: 16.1, client_count: 190, manager_exp_years: 18, min_investment_lakh: 50 },
+      { name: "Emkay Investment Managers PMS",              manager: "Emkay Investment Mgrs",    strategy: "Mid & Small Cap", aum_cr: 2100,  alpha_3y: 5.2,  sharpe_ratio: 1.38, max_drawdown: -13.4, irr_inception: 14.0, client_count: 110, manager_exp_years: 11, min_investment_lakh: 50 },
     ];
-    return list.map((r) => ({ ...r, asset_class: "PMS" }));
+    return list.map((r) => ({
+      ...r,
+      asset_class: "PMS",
+      // Computed aliases for frontend
+      alpha: r.alpha_3y,
+      sharpe: r.sharpe_ratio,
+      irr_3y: r.irr_inception,
+      clients: r.client_count,
+      experience_years: r.manager_exp_years,
+      min_investment: r.min_investment_lakh,
+      returns_1y: parseFloat((BENCHMARK_1Y + r.alpha_3y * 0.7).toFixed(1)),
+      returns_3y: parseFloat((BENCHMARK_3Y + r.alpha_3y).toFixed(1)),
+    }));
   }
 
   /** Stub AIF data (Alternative Investment Funds; replace with SEBI AIF registry / VCCircle API when available) */
   async getStubAIF() {
     const list = [
-      { name: "Kotak Alternate Asset AIF Cat II",          category: "Category II",  strategy: "PE",             vintage_year: 2021, irr_target: 18.0, distribution_yield: 12.0, lock_in_years: 5, min_investment_cr: 1 },
-      { name: "ICICI Pru Credit Opportunities AIF",        category: "Category II",  strategy: "Credit",         vintage_year: 2020, irr_target: 14.0, distribution_yield: 10.0, lock_in_years: 3, min_investment_cr: 1 },
-      { name: "HDFC Capital AIF Category III Hedge",       category: "Category III", strategy: "Hedge",          vintage_year: 2022, irr_target: 15.0, distribution_yield: 0.0,  lock_in_years: 1, min_investment_cr: 1 },
-      { name: "Axis Alternatives AIF Real Estate",         category: "Category II",  strategy: "Real Estate",    vintage_year: 2021, irr_target: 16.0, distribution_yield: 8.0,  lock_in_years: 4, min_investment_cr: 1 },
-      { name: "SBI Opportunities Fund AIF",                category: "Category I",   strategy: "Infrastructure", vintage_year: 2020, irr_target: 12.0, distribution_yield: 7.0,  lock_in_years: 7, min_investment_cr: 1 },
-      { name: "Motilal Oswal AIF India Credit",            category: "Category II",  strategy: "Credit",         vintage_year: 2021, irr_target: 14.5, distribution_yield: 11.0, lock_in_years: 3, min_investment_cr: 1 },
-      { name: "Nippon India AIF Infra Fund",               category: "Category I",   strategy: "Infrastructure", vintage_year: 2019, irr_target: 11.0, distribution_yield: 6.5,  lock_in_years: 8, min_investment_cr: 1 },
-      { name: "Avendus Future Leaders AIF",                category: "Category III", strategy: "Hedge",          vintage_year: 2022, irr_target: 20.0, distribution_yield: 0.0,  lock_in_years: 1, min_investment_cr: 1 },
-      { name: "True Beacon AIF One",                       category: "Category III", strategy: "Hedge",          vintage_year: 2019, irr_target: 18.0, distribution_yield: 0.0,  lock_in_years: 1, min_investment_cr: 10 },
-      { name: "Edelweiss AIF Private Equity",              category: "Category II",  strategy: "PE",             vintage_year: 2020, irr_target: 19.0, distribution_yield: 0.0,  lock_in_years: 6, min_investment_cr: 1 },
-      { name: "360 ONE Alternate Assets AIF",              category: "Category II",  strategy: "PE",             vintage_year: 2022, irr_target: 17.5, distribution_yield: 5.0,  lock_in_years: 5, min_investment_cr: 1 },
-      { name: "Multiples PE AIF",                          category: "Category II",  strategy: "PE",             vintage_year: 2018, irr_target: 22.0, distribution_yield: 0.0,  lock_in_years: 7, min_investment_cr: 5 },
-      { name: "ICICI Prudential AIF Infrastructure",       category: "Category I",   strategy: "Infrastructure", vintage_year: 2021, irr_target: 12.5, distribution_yield: 7.5,  lock_in_years: 7, min_investment_cr: 1 },
-      { name: "Blume Ventures AIF IV",                     category: "Category I",   strategy: "PE",             vintage_year: 2022, irr_target: 25.0, distribution_yield: 0.0,  lock_in_years: 8, min_investment_cr: 1 },
-      { name: "Waterfield Advisors AIF Real Estate",       category: "Category II",  strategy: "Real Estate",    vintage_year: 2021, irr_target: 15.0, distribution_yield: 7.0,  lock_in_years: 4, min_investment_cr: 2 },
+      { name: "Kotak Alternate Asset AIF Cat II",          manager: "Kotak Investment Advisors",    category: "Category II",  strategy: "PE",             vintage_year: 2021, irr_target: 18.0, irr_achieved: 16.4, distribution_yield: 12.0, lock_in_years: 5, min_investment_cr: 1, aum_cr: 2400 },
+      { name: "ICICI Pru Credit Opportunities AIF",        manager: "ICICI Prudential AMC",         category: "Category II",  strategy: "Credit",         vintage_year: 2020, irr_target: 14.0, irr_achieved: 13.2, distribution_yield: 10.0, lock_in_years: 3, min_investment_cr: 1, aum_cr: 1800 },
+      { name: "HDFC Capital AIF Category III Hedge",       manager: "HDFC Capital Advisors",        category: "Category III", strategy: "Hedge",          vintage_year: 2022, irr_target: 15.0, irr_achieved: 14.1, distribution_yield: 0.0,  lock_in_years: 1, min_investment_cr: 1, aum_cr: 950  },
+      { name: "Axis Alternatives AIF Real Estate",         manager: "Axis Capital",                 category: "Category II",  strategy: "Real Estate",    vintage_year: 2021, irr_target: 16.0, irr_achieved: 14.8, distribution_yield: 8.0,  lock_in_years: 4, min_investment_cr: 1, aum_cr: 1200 },
+      { name: "SBI Opportunities Fund AIF",                manager: "SBI CAP Ventures",             category: "Category I",   strategy: "Infrastructure", vintage_year: 2020, irr_target: 12.0, irr_achieved: 11.4, distribution_yield: 7.0,  lock_in_years: 7, min_investment_cr: 1, aum_cr: 3200 },
+      { name: "Motilal Oswal AIF India Credit",            manager: "Motilal Oswal AMC",            category: "Category II",  strategy: "Credit",         vintage_year: 2021, irr_target: 14.5, irr_achieved: 13.8, distribution_yield: 11.0, lock_in_years: 3, min_investment_cr: 1, aum_cr: 1600 },
+      { name: "Nippon India AIF Infra Fund",               manager: "Nippon India AMC",             category: "Category I",   strategy: "Infrastructure", vintage_year: 2019, irr_target: 11.0, irr_achieved: 10.6, distribution_yield: 6.5,  lock_in_years: 8, min_investment_cr: 1, aum_cr: 2800 },
+      { name: "Avendus Future Leaders AIF",                manager: "Avendus Capital",              category: "Category III", strategy: "Hedge",          vintage_year: 2022, irr_target: 20.0, irr_achieved: 18.2, distribution_yield: 0.0,  lock_in_years: 1, min_investment_cr: 1, aum_cr: 720  },
+      { name: "True Beacon AIF One",                       manager: "True Beacon",                  category: "Category III", strategy: "Hedge",          vintage_year: 2019, irr_target: 18.0, irr_achieved: 16.8, distribution_yield: 0.0,  lock_in_years: 1, min_investment_cr: 10, aum_cr: 1400 },
+      { name: "Edelweiss AIF Private Equity",              manager: "Edelweiss Alternatives",       category: "Category II",  strategy: "PE",             vintage_year: 2020, irr_target: 19.0, irr_achieved: 17.4, distribution_yield: 0.0,  lock_in_years: 6, min_investment_cr: 1, aum_cr: 1900 },
+      { name: "360 ONE Alternate Assets AIF",              manager: "360 ONE Asset Mgmt",           category: "Category II",  strategy: "PE",             vintage_year: 2022, irr_target: 17.5, irr_achieved: 15.8, distribution_yield: 5.0,  lock_in_years: 5, min_investment_cr: 1, aum_cr: 1100 },
+      { name: "Multiples PE AIF",                          manager: "Multiples Alternate Asset Mgmt", category: "Category II", strategy: "PE",            vintage_year: 2018, irr_target: 22.0, irr_achieved: 20.8, distribution_yield: 0.0,  lock_in_years: 7, min_investment_cr: 5, aum_cr: 4200 },
+      { name: "ICICI Prudential AIF Infrastructure",       manager: "ICICI Prudential AMC",         category: "Category I",   strategy: "Infrastructure", vintage_year: 2021, irr_target: 12.5, irr_achieved: 11.8, distribution_yield: 7.5,  lock_in_years: 7, min_investment_cr: 1, aum_cr: 2100 },
+      { name: "Blume Ventures AIF IV",                     manager: "Blume Ventures",               category: "Category I",   strategy: "PE",             vintage_year: 2022, irr_target: 25.0, irr_achieved: 22.4, distribution_yield: 0.0,  lock_in_years: 8, min_investment_cr: 1, aum_cr: 680  },
+      { name: "Waterfield Advisors AIF Real Estate",       manager: "Waterfield Advisors",          category: "Category II",  strategy: "Real Estate",    vintage_year: 2021, irr_target: 15.0, irr_achieved: 13.6, distribution_yield: 7.0,  lock_in_years: 4, min_investment_cr: 2, aum_cr: 840  },
     ];
-    return list.map((r) => ({ ...r, asset_class: "AIF" }));
+    return list.map((r) => ({
+      ...r,
+      asset_class: "AIF",
+      // Computed aliases for frontend (min_investment in lakhs: 1 Cr = 100 lakhs)
+      min_investment: r.min_investment_cr * 100,
+      distributions: r.distribution_yield,
+      nav: 100 + (2026 - r.vintage_year) * r.irr_achieved,
+    }));
   }
 
   /**
