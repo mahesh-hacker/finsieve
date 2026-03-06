@@ -94,7 +94,6 @@ const PlanCard = ({
   return (
     <Card
       sx={{
-        position: "relative",
         borderRadius: 3,
         border: plan.highlighted
           ? `2px solid ${plan.color}`
@@ -105,32 +104,27 @@ const PlanCard = ({
           ? "rgba(17,24,39,0.7)"
           : "background.paper",
         boxShadow: plan.highlighted
-          ? `0 8px 40px ${alpha(plan.color, 0.2)}`
+          ? `0 8px 40px ${alpha(plan.color, 0.25)}`
           : undefined,
-        transform: plan.highlighted ? "scale(1.02)" : "none",
         transition: "all 0.2s",
         flex: 1,
         minWidth: 0,
         display: "flex",
         flexDirection: "column",
+        overflow: "hidden",
       }}
     >
-      {/* Most Popular badge */}
+      {/* Most Popular banner — rendered as top bar inside the card */}
       {plan.highlighted && (
         <Box
           sx={{
-            position: "absolute",
-            top: -14,
-            left: "50%",
-            transform: "translateX(-50%)",
             bgcolor: plan.color,
             color: "#fff",
             fontSize: 10,
             fontWeight: 800,
             letterSpacing: 1.5,
-            px: 2,
-            py: 0.5,
-            borderRadius: 10,
+            textAlign: "center",
+            py: 0.75,
             whiteSpace: "nowrap",
           }}
         >
@@ -433,7 +427,6 @@ const Pricing = () => {
           flexDirection: { xs: "column", md: "row" },
           alignItems: { xs: "stretch", md: "flex-start" },
           mb: 3,
-          mt: { xs: 1, md: 3 }, // extra top margin to accommodate Most Popular badge
         }}
       >
         {PLANS.map((plan) => (

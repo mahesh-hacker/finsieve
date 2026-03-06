@@ -107,10 +107,27 @@ const Dashboard = () => {
   }, [fetchIndices]);
 
   useEffect(() => {
-    if (liveIndices.length) {
-      setIndices(liveIndices as unknown as GlobalIndex[]);
-      setLastUpdate(liveUpdate);
-    }
+    if (!liveIndices.length) return;
+    setIndices((prev) => {
+      if (!prev.length) return prev;
+      const liveMap = new Map(liveIndices.map((r) => [r.symbol, r]));
+      return prev.map((idx) => {
+        const live = liveMap.get(idx.symbol);
+        if (!live) return idx;
+        return {
+          ...idx,
+          current_value: live.current_value,
+          change: live.change,
+          change_percent: live.change_percent,
+          open: live.open ?? idx.open,
+          high: live.high ?? idx.high,
+          low: live.low ?? idx.low,
+          previous_close: live.previous_close ?? idx.previous_close,
+          last_updated: live.last_updated,
+        };
+      });
+    });
+    setLastUpdate(liveUpdate);
   }, [liveIndices, liveUpdate]);
 
   useEffect(() => {

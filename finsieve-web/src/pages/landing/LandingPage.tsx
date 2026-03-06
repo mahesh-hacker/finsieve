@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { PLANS } from "../../config/plans";
 import { useNavigate, Link } from "react-router-dom";
 import {
   Box,
@@ -1173,61 +1174,25 @@ const LandingPage = () => {
             justifyContent="center"
             sx={{ pt: 2 }}
           >
-            <Grid size={{ xs: 12, sm: 10, md: 4 }}>
-              <PricingCard
-                plan="Free"
-                price="₹0"
-                period="forever"
-                features={[
-                  "15-min delayed market data",
-                  "All 8 asset classes",
-                  "3 Watchlists",
-                  "100 screener results/export",
-                  "Basic charting",
-                  "Up to 5 comparisons",
-                ]}
-                cta="Get Started Free"
-                onCta={() => navigate("/register")}
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 10, md: 4 }}>
-              <PricingCard
-                plan="Premium"
-                price="₹299"
-                period="month"
-                features={[
-                  "Real-time market data",
-                  "Unlimited watchlists",
-                  "Unlimited screener exports",
-                  "Advanced technical indicators",
-                  "Drawing tools on charts",
-                  "Intraday charts (1m, 5m, 15m)",
-                  "Personalized news feed",
-                  "Priority support",
-                ]}
-                cta="Start Premium Trial"
-                highlight
-                badge="MOST POPULAR"
-                onCta={() => navigate("/register")}
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 10, md: 4 }}>
-              <PricingCard
-                plan="Enterprise"
-                price="Custom"
-                period=""
-                features={[
-                  "Everything in Premium",
-                  "Dedicated REST API access",
-                  "Custom data integrations",
-                  "Multi-seat team accounts",
-                  "SLA guarantees (99.9%)",
-                  "Dedicated account manager",
-                ]}
-                cta="Contact Sales"
-                onCta={() => navigate("/register")}
-              />
-            </Grid>
+            {PLANS.map((plan) => {
+              const monthlyBilling = plan.billing.find((b) => b.period === "monthly") ?? plan.billing[0];
+              const isFree = plan.id === "explorer";
+              const isElite = plan.id === "elite";
+              return (
+                <Grid key={plan.id} size={{ xs: 12, sm: 10, md: 4 }}>
+                  <PricingCard
+                    plan={plan.name}
+                    price={isFree ? "₹0" : `₹${monthlyBilling.perMonth.toLocaleString("en-IN")}`}
+                    period={isFree ? "forever" : "month"}
+                    features={plan.features}
+                    cta={isFree ? "Get Started Free" : isElite ? "See Elite Plans" : `Start ${plan.trialDays}-Day Free Trial`}
+                    highlight={!!plan.highlighted}
+                    badge={plan.highlighted ? "MOST POPULAR" : undefined}
+                    onCta={() => isFree ? navigate("/register") : navigate("/pricing")}
+                  />
+                </Grid>
+              );
+            })}
           </Grid>
 
           <Typography

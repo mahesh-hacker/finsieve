@@ -99,9 +99,52 @@ export const getIndicesByCountry = async (req, res) => {
  * Get major indices
  * GET /api/v1/market/indices/major
  */
+// Yahoo Finance symbol map for major indices fallback
+const MAJOR_YF_SYMBOLS = [
+  { symbol: "NIFTY",    yf: "^NSEI",   name: "NIFTY 50",       country: "India"  },
+  { symbol: "SENSEX",   yf: "^BSESN",  name: "S&P BSE SENSEX", country: "India"  },
+  { symbol: "BANKNIFTY",yf: "^NSEBANK",name: "NIFTY Bank",     country: "India"  },
+  { symbol: "DJI",      yf: "^DJI",    name: "Dow Jones",      country: "USA"    },
+  { symbol: "SPX",      yf: "^GSPC",   name: "S&P 500",        country: "USA"    },
+  { symbol: "IXIC",     yf: "^IXIC",   name: "NASDAQ",         country: "USA"    },
+  { symbol: "FTSE",     yf: "^FTSE",   name: "FTSE 100",       country: "UK"     },
+  { symbol: "N225",     yf: "^N225",   name: "Nikkei 225",     country: "Japan"  },
+  { symbol: "HSI",      yf: "^HSI",    name: "Hang Seng",      country: "HongKong" },
+];
+
 export const getMajorIndices = async (req, res) => {
   try {
-    const indices = await marketService.getMajorIndices();
+    let indices = await marketService.getMajorIndices();
+
+    // Fallback: fetch from Yahoo Finance when DB has no data
+    if (!indices.length) {
+      const results = await Promise.allSettled(
+        MAJOR_YF_SYMBOLS.map(({ yf }) =>
+          yahooFinance.quote(yf, {}, { validateResult: false })
+        )
+      );
+      indices = results
+        .map((r, i) => {
+          if (r.status !== "fulfilled" || !r.value) return null;
+          const q = r.value;
+          const meta = MAJOR_YF_SYMBOLS[i];
+          return {
+            id: meta.symbol,
+            symbol: meta.symbol,
+            name: meta.name,
+            country: meta.country,
+            current_value: q.regularMarketPrice ?? 0,
+            change: q.regularMarketChange ?? 0,
+            change_percent: q.regularMarketChangePercent ?? 0,
+            previous_close: q.regularMarketPreviousClose ?? null,
+            open: q.regularMarketOpen ?? null,
+            high: q.regularMarketDayHigh ?? null,
+            low: q.regularMarketDayLow ?? null,
+            last_updated: new Date().toISOString(),
+          };
+        })
+        .filter(Boolean);
+    }
 
     res.json({
       success: true,
