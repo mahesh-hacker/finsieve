@@ -194,7 +194,7 @@ const Comparison = () => {
           </Typography>
         </Box>
         <Typography variant="body1" color="text.secondary">
-          Compare up to 5 instruments side-by-side across any asset class —
+          Compare up to 5 instruments side-by-side across any asset class -
           stocks vs crypto vs mutual funds? Why not.
         </Typography>
       </Box>
@@ -607,7 +607,7 @@ const Comparison = () => {
             Search and add instruments to start comparing
           </Typography>
           <Typography variant="body2" color="text.disabled" sx={{ mt: 1 }}>
-            Compare stocks vs crypto, mutual funds vs indices — any combination
+            Compare stocks vs crypto, mutual funds vs indices - any combination
             across asset classes
           </Typography>
         </Card>

@@ -926,7 +926,7 @@ const ProfileSettings = () => {
               action={
                 <Box display="flex" gap={1}>
                   <Button size="small" color="inherit" onClick={() => setShowDeleteConfirm(false)}>Cancel</Button>
-                  <Button size="small" color="error" variant="contained" onClick={() => toast.error("Account deletion requires email verification — feature coming soon")}>
+                  <Button size="small" color="error" variant="contained" onClick={() => toast.error("Account deletion requires email verification - feature coming soon")}>
                     Delete
                   </Button>
                 </Box>

@@ -286,7 +286,7 @@ const IndianIndices = () => {
           <AccountBalance sx={{ color: "#10b981", fontSize: 20, flexShrink: 0 }} />
           <Box>
             <Typography sx={{ fontSize: 13, fontWeight: 700, color: "#10b981" }}>
-              GIFT India / NSE IFSC — International Financial Services Centre
+              GIFT India / NSE IFSC - International Financial Services Centre
             </Typography>
             <Typography sx={{ fontSize: 11, color: "text.secondary" }}>
               GIFT City (Gujarat), India's first IFSC. NSE IFSC offers NIFTY 50 & Bank Nifty

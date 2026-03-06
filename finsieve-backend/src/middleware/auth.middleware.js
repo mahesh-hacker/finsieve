@@ -136,8 +136,8 @@ export const requireTier = (minTier) => {
   };
 
   return (req, res, next) => {
-    const userTierLevel = tierLevels[req.user.userTier] || 0;
-    const requiredTierLevel = tierLevels[minTier] || 0;
+    const userTierLevel = tierLevels[req.user.userTier?.toLowerCase()] ?? 0;
+    const requiredTierLevel = tierLevels[minTier?.toLowerCase()] ?? 0;
 
     if (userTierLevel < requiredTierLevel) {
       return res.status(403).json({

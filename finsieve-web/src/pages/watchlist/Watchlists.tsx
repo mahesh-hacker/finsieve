@@ -213,7 +213,7 @@ const Watchlists = () => {
             </Typography>
           </Box>
           <Typography variant="body1" color="text.secondary">
-            Track your favorite instruments across all asset classes — one place
+            Track your favorite instruments across all asset classes - one place
             for everything
           </Typography>
         </Box>

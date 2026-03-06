@@ -155,7 +155,7 @@ const Bonds = () => {
             border: `1px solid ${alpha("#f59e0b", 0.3)}`,
           }}
         >
-          ⚠️ Yield Curve Inversion Detected — The 2-year yield exceeds the
+          ⚠️ Yield Curve Inversion Detected - The 2-year yield exceeds the
           10-year yield. Historically this signals a potential recession.
           {yieldCurve.spread_2_10 !== null && (
             <Typography variant="body2" sx={{ mt: 0.5 }}>

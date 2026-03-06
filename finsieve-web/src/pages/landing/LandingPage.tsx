@@ -505,7 +505,7 @@ const LandingPage = () => {
       icon: <Public />,
       title: "8+ Asset Classes",
       description:
-        "Indian & US Equities, Mutual Funds, Commodities, Bonds, Crypto, and Global Indices — all in one place.",
+        "Indian & US Equities, Mutual Funds, Commodities, Bonds, Crypto, and Global Indices - all in one place.",
       gradient: "linear-gradient(135deg, #6366f1, #8b5cf6)",
       delay: "0s",
     },
@@ -847,7 +847,7 @@ const LandingPage = () => {
             }}
           >
             The most powerful investment intelligence platform in India. Compare
-            stocks, funds, crypto, bonds, and commodities — all in one place,
+            stocks, funds, crypto, bonds, and commodities - all in one place,
             with institutional-grade analytics.
           </Typography>
 
@@ -1048,7 +1048,7 @@ const LandingPage = () => {
             </Typography>
             <Typography color="text.secondary" sx={{ maxWidth: 520, mx: "auto", fontSize: 16, lineHeight: 1.7 }}>
               From basic research to institutional-grade analysis, Finsieve gives
-              you every tool you need — completely free to start.
+              you every tool you need - completely free to start.
             </Typography>
           </Box>
 

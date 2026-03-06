@@ -78,7 +78,7 @@ export const INDIAN_STOCKS: IndianStock[] = [
   { name: "NTPC", symbol: "NTPC", bse: "532555", sector: "Oil Gas & Energy", cap: "Large Cap", desc: "India's largest power generation company" },
   { name: "Power Grid Corporation", symbol: "POWERGRID", bse: "532898", sector: "Oil Gas & Energy", cap: "Large Cap", desc: "Central power transmission utility" },
   { name: "Adani Green Energy", symbol: "ADANIGREEN", bse: "541450", sector: "Oil Gas & Energy", cap: "Large Cap", desc: "India's largest renewable energy company" },
-  { name: "Tata Power", symbol: "TATAPOWER", bse: "500400", sector: "Oil Gas & Energy", cap: "Large Cap", desc: "Diversified power — generation, transmission, solar" },
+  { name: "Tata Power", symbol: "TATAPOWER", bse: "500400", sector: "Oil Gas & Energy", cap: "Large Cap", desc: "Diversified power - generation, transmission, solar" },
   { name: "Adani Ports", symbol: "ADANIPORTS", bse: "532921", sector: "Oil Gas & Energy", cap: "Large Cap", desc: "India's largest private port developer" },
 
   // FMCG & Consumer Goods
@@ -87,7 +87,7 @@ export const INDIAN_STOCKS: IndianStock[] = [
   { name: "Nestle India", symbol: "NESTLEIND", bse: "500790", sector: "FMCG & Consumer Goods", cap: "Large Cap", desc: "Food & beverages: Maggi, KitKat, Munch" },
   { name: "Britannia Industries", symbol: "BRITANNIA", bse: "500825", sector: "FMCG & Consumer Goods", cap: "Large Cap", desc: "India's largest biscuit maker" },
   { name: "Dabur India", symbol: "DABUR", bse: "500096", sector: "FMCG & Consumer Goods", cap: "Large Cap", desc: "Ayurvedic FMCG, healthcare & home care" },
-  { name: "Marico", symbol: "MARICO", bse: "531642", sector: "FMCG & Consumer Goods", cap: "Large Cap", desc: "Parachute, Saffola — hair & health oils" },
+  { name: "Marico", symbol: "MARICO", bse: "531642", sector: "FMCG & Consumer Goods", cap: "Large Cap", desc: "Parachute, Saffola - hair & health oils" },
   { name: "Godrej Consumer Products", symbol: "GODREJCP", bse: "532424", sector: "FMCG & Consumer Goods", cap: "Large Cap", desc: "HI, hair colours, soaps globally" },
   { name: "Emami", symbol: "EMAMILTD", bse: "531162", sector: "FMCG & Consumer Goods", cap: "Mid Cap", desc: "Fair & Handsome, Boroplus, Navratna" },
   { name: "Colgate-Palmolive India", symbol: "COLPAL", bse: "500830", sector: "FMCG & Consumer Goods", cap: "Large Cap", desc: "Oral care market leader in India" },
@@ -108,7 +108,7 @@ export const INDIAN_STOCKS: IndianStock[] = [
   // Automobile & Auto Ancillaries
   { name: "Maruti Suzuki", symbol: "MARUTI", bse: "532500", sector: "Automobile & Auto Ancillaries", cap: "Large Cap", desc: "India's largest passenger car maker (~40% market share)" },
   { name: "Tata Motors", symbol: "TATAMOTORS", bse: "500570", sector: "Automobile & Auto Ancillaries", cap: "Large Cap", desc: "Commercial vehicles, Jaguar Land Rover" },
-  { name: "Mahindra & Mahindra", symbol: "M&M", bse: "500520", sector: "Automobile & Auto Ancillaries", cap: "Large Cap", desc: "SUVs, tractors, EVs — diversified auto" },
+  { name: "Mahindra & Mahindra", symbol: "M&M", bse: "500520", sector: "Automobile & Auto Ancillaries", cap: "Large Cap", desc: "SUVs, tractors, EVs - diversified auto" },
   { name: "Bajaj Auto", symbol: "BAJAJ-AUTO", bse: "532977", sector: "Automobile & Auto Ancillaries", cap: "Large Cap", desc: "2-wheelers & 3-wheelers, strong exports" },
   { name: "Hero MotoCorp", symbol: "HEROMOTOCO", bse: "500182", sector: "Automobile & Auto Ancillaries", cap: "Large Cap", desc: "World's largest 2-wheeler maker by volume" },
   { name: "Eicher Motors", symbol: "EICHERMOT", bse: "505200", sector: "Automobile & Auto Ancillaries", cap: "Large Cap", desc: "Royal Enfield + commercial vehicles (VECV)" },
@@ -153,7 +153,7 @@ export const INDIAN_STOCKS: IndianStock[] = [
 
   // Chemicals & Specialty
   { name: "Asian Paints", symbol: "ASIANPAINT", bse: "500820", sector: "Chemicals & Specialty", cap: "Large Cap", desc: "India's largest paint company" },
-  { name: "Pidilite Industries", symbol: "PIDILITIND", bse: "500331", sector: "Chemicals & Specialty", cap: "Large Cap", desc: "Fevicol, Dr. Fixit — adhesives & construction chemicals" },
+  { name: "Pidilite Industries", symbol: "PIDILITIND", bse: "500331", sector: "Chemicals & Specialty", cap: "Large Cap", desc: "Fevicol, Dr. Fixit - adhesives & construction chemicals" },
   { name: "SRF Limited", symbol: "SRF", bse: "503806", sector: "Chemicals & Specialty", cap: "Large Cap", desc: "Specialty chemicals, fluorochemicals, packaging" },
   { name: "Navin Fluorine", symbol: "NAVINFLUOR", bse: "500..", sector: "Chemicals & Specialty", cap: "Mid Cap", desc: "Specialty fluorochemicals for pharma & agro" },
   { name: "PI Industries", symbol: "PIIND", bse: "523642", sector: "Chemicals & Specialty", cap: "Large Cap", desc: "Agrochemicals & custom synthesis for global pharma" },
@@ -167,7 +167,7 @@ export const INDIAN_STOCKS: IndianStock[] = [
   { name: "Siemens India", symbol: "SIEMENS", bse: "500550", sector: "Capital Goods & Defence", cap: "Large Cap", desc: "Industrial automation, smart infrastructure" },
   { name: "ABB India", symbol: "ABB", bse: "500002", sector: "Capital Goods & Defence", cap: "Large Cap", desc: "Electrification, robotics, motion products" },
   { name: "Bharat Electronics", symbol: "BEL", bse: "500049", sector: "Capital Goods & Defence", cap: "Large Cap", desc: "Defence electronics, radars, communication systems" },
-  { name: "HAL (Hindustan Aeronautics)", symbol: "HAL", bse: "541154", sector: "Capital Goods & Defence", cap: "Large Cap", desc: "Fighter jets, helicopters — India's defence giant" },
+  { name: "HAL (Hindustan Aeronautics)", symbol: "HAL", bse: "541154", sector: "Capital Goods & Defence", cap: "Large Cap", desc: "Fighter jets, helicopters - India's defence giant" },
   { name: "Bharat Forge", symbol: "BHARATFORG", bse: "500493", sector: "Capital Goods & Defence", cap: "Large Cap", desc: "Forgings for auto, aerospace & defence" },
   { name: "Thermax", symbol: "THERMAX", bse: "500411", sector: "Capital Goods & Defence", cap: "Large Cap", desc: "Energy & environment solutions" },
   { name: "Cummins India", symbol: "CUMMINSIND", bse: "500480", sector: "Capital Goods & Defence", cap: "Large Cap", desc: "Diesel & alternative fuel engines" },
@@ -178,10 +178,10 @@ export const INDIAN_STOCKS: IndianStock[] = [
   // Retail & Consumer Durables
   { name: "Avenue Supermarts (DMart)", symbol: "DMART", bse: "540376", sector: "Retail & Consumer Durables", cap: "Large Cap", desc: "India's most profitable grocery retailer" },
   { name: "Titan Company", symbol: "TITAN", bse: "500114", sector: "Retail & Consumer Durables", cap: "Large Cap", desc: "Watches, jewellery (Tanishq), eyewear" },
-  { name: "Trent Limited", symbol: "TRENT", bse: "500251", sector: "Retail & Consumer Durables", cap: "Large Cap", desc: "Westside, Zudio — Tata's retail arm" },
+  { name: "Trent Limited", symbol: "TRENT", bse: "500251", sector: "Retail & Consumer Durables", cap: "Large Cap", desc: "Westside, Zudio - Tata's retail arm" },
   { name: "Voltas", symbol: "VOLTAS", bse: "500575", sector: "Retail & Consumer Durables", cap: "Large Cap", desc: "Air conditioners & commercial refrigeration" },
   { name: "Havells India", symbol: "HAVELLS", bse: "517354", sector: "Retail & Consumer Durables", cap: "Large Cap", desc: "Electricals, fans, cables, appliances" },
-  { name: "Crompton Greaves Consumer", symbol: "CROMPTON", bse: "539876", sector: "Retail & Consumer Durables", cap: "Mid Cap", desc: "Fans, pumps, lighting — consumer electricals" },
+  { name: "Crompton Greaves Consumer", symbol: "CROMPTON", bse: "539876", sector: "Retail & Consumer Durables", cap: "Mid Cap", desc: "Fans, pumps, lighting - consumer electricals" },
   { name: "Dixon Technologies", symbol: "DIXON", bse: "540699", sector: "Retail & Consumer Durables", cap: "Mid Cap", desc: "EMS: TVs, mobiles, home appliances OEM" },
   { name: "Info Edge (Naukri)", symbol: "NAUKRI", bse: "532777", sector: "Retail & Consumer Durables", cap: "Large Cap", desc: "Naukri, 99acres, Jeevansathi, Shiksha" },
   { name: "Zomato", symbol: "ZOMATO", bse: "543320", sector: "Retail & Consumer Durables", cap: "Large Cap", desc: "Food delivery & quick commerce (Blinkit)" },

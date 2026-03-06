@@ -181,13 +181,13 @@ const AboutUs = () => {
               Finsieve is India&apos;s first 360° investment intelligence platform, built to help investors
               research smarter, compare faster, and make informed decisions across asset classes.
               We bring Indian and US equities, mutual funds, commodities, bonds, cryptocurrencies,
-              and global indices into one unified experience—with institutional-grade analytics,
+              and global indices into one unified experience - with institutional-grade analytics,
               advanced screening, and side-by-side comparison tools.
             </Typography>
             <Typography color="text.secondary" sx={{ lineHeight: 1.8, fontSize: 15, mt: 2 }}>
               Our mission is to democratize access to professional-grade investment research.
               Whether you&apos;re a retail investor, wealth manager, or NRI, Finsieve gives you the data
-              and tools you need—with bank-grade security and full adherence to SEBI guidelines.
+              and tools you need - with bank-grade security and full adherence to SEBI guidelines.
             </Typography>
           </Box>
 
@@ -229,7 +229,7 @@ const AboutUs = () => {
             <Typography color="text.secondary" sx={{ lineHeight: 1.8, fontSize: 15 }}>
               Finsieve was founded by Mahesh Mishra with a vision to simplify investment research
               for every Indian investor. Combining deep domain expertise in markets and technology,
-              Mahesh leads the team in building a platform that is both powerful and accessible—
+              Mahesh leads the team in building a platform that is both powerful and accessible -
               so you can focus on what matters: making better investment decisions.
             </Typography>
           </Box>

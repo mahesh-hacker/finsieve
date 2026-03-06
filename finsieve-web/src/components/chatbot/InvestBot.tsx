@@ -266,7 +266,7 @@ const InvestBot = () => {
     <>
       {/* ── Floating Button ── */}
       {!open && (
-        <Tooltip title="InvestBot — AI Investment Assistant" placement="left">
+        <Tooltip title="InvestBot - AI Investment Assistant" placement="left">
           <Fab
             onClick={() => setOpen(true)}
             sx={{

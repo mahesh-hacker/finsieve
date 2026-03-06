@@ -397,7 +397,7 @@ const Screening = ({ defaultAssetClass }: ScreeningProps) => {
           </Typography>
         </Box>
         <Typography variant="body1" color="text.secondary">
-          Filter across 10 asset classes — Equities, Crypto, MF, ETF, SIF, PMS, AIF & more
+          Filter across 10 asset classes - Equities, Crypto, MF, ETF, SIF, PMS, AIF & more
         </Typography>
       </Box>
 

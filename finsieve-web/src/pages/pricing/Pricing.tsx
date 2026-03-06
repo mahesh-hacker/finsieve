@@ -44,7 +44,7 @@ function initiateCheckout(plan: Plan, period: BillingPeriod, userEmail: string) 
   if (!RAZORPAY_KEY) {
     // Payment not yet wired up — show info toast
     toast.success(
-      `Redirecting to checkout for ${plan.name} (${billing.label}).\nPayment integration coming soon — contact hello@finsieve.in to subscribe.`,
+      `Redirecting to checkout for ${plan.name} (${billing.label}).\nPayment integration coming soon - contact hello@finsieve.in to subscribe.`,
       { duration: 6000 }
     );
     return;
@@ -55,7 +55,7 @@ function initiateCheckout(plan: Plan, period: BillingPeriod, userEmail: string) 
     amount: billing.price * 100, // paise
     currency: "INR",
     name: "Finsieve",
-    description: `${plan.name} — ${billing.label}`,
+    description: `${plan.name} - ${billing.label}`,
     prefill: { email: userEmail },
     theme: { color: plan.color },
     handler: () => {
@@ -448,7 +448,7 @@ const Pricing = () => {
       >
         {[
           "14-day free trial, no credit card needed",
-          "Cancel anytime — no lock-in",
+          "Cancel anytime - no lock-in",
           "Secure payments via Razorpay",
           "GST invoice provided",
         ].map((t) => (
