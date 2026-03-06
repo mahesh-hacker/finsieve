@@ -172,6 +172,127 @@ class YahooFinanceService {
     };
 
     // ═══════════════════════════════════════════════════════
+    // INDIAN MARKET INDICES — NSE Sectoral + BSE + GIFT India
+    // ═══════════════════════════════════════════════════════
+    this.indianIndices = {
+      // ── Broad Market ──────────────────────────────────
+      "^NSEI": {
+        symbol: "NIFTY",
+        name: "NIFTY 50",
+        country: "India",
+        exchange: "NSE",
+        category: "Broad Market",
+      },
+      "^BSESN": {
+        symbol: "SENSEX",
+        name: "BSE SENSEX",
+        country: "India",
+        exchange: "BSE",
+        category: "Broad Market",
+      },
+      "^NSEMDCP50": {
+        symbol: "NIFMDCP50",
+        name: "NIFTY Midcap 50",
+        country: "India",
+        exchange: "NSE",
+        category: "Broad Market",
+      },
+      "^CNXMIDCAP": {
+        symbol: "NIFMDCP100",
+        name: "NIFTY Midcap 100",
+        country: "India",
+        exchange: "NSE",
+        category: "Broad Market",
+      },
+      "^CNXSMALLCAP": {
+        symbol: "NIFSMCP100",
+        name: "NIFTY Smallcap 100",
+        country: "India",
+        exchange: "NSE",
+        category: "Broad Market",
+      },
+      // ── Sectoral ──────────────────────────────────────
+      "^NSEBANK": {
+        symbol: "BANKNIFTY",
+        name: "NIFTY Bank",
+        country: "India",
+        exchange: "NSE",
+        category: "Sectoral",
+      },
+      "^CNXFINANCE": {
+        symbol: "NIFFIN",
+        name: "NIFTY Financial Services",
+        country: "India",
+        exchange: "NSE",
+        category: "Sectoral",
+      },
+      "^CNXIT": {
+        symbol: "NIFTYIT",
+        name: "NIFTY IT",
+        country: "India",
+        exchange: "NSE",
+        category: "Sectoral",
+      },
+      "^CNXAUTO": {
+        symbol: "NIFTYAUTO",
+        name: "NIFTY Auto",
+        country: "India",
+        exchange: "NSE",
+        category: "Sectoral",
+      },
+      "^CNXPHARMA": {
+        symbol: "NIFTYPHARMA",
+        name: "NIFTY Pharma",
+        country: "India",
+        exchange: "NSE",
+        category: "Sectoral",
+      },
+      "^CNXFMCG": {
+        symbol: "NIFTYFMCG",
+        name: "NIFTY FMCG",
+        country: "India",
+        exchange: "NSE",
+        category: "Sectoral",
+      },
+      "^CNXMETAL": {
+        symbol: "NIFTYMETAL",
+        name: "NIFTY Metal",
+        country: "India",
+        exchange: "NSE",
+        category: "Sectoral",
+      },
+      "^CNXREALTY": {
+        symbol: "NIFTYREAL",
+        name: "NIFTY Realty",
+        country: "India",
+        exchange: "NSE",
+        category: "Sectoral",
+      },
+      "^CNXENERGY": {
+        symbol: "NIFTENERGY",
+        name: "NIFTY Energy",
+        country: "India",
+        exchange: "NSE",
+        category: "Sectoral",
+      },
+      "^CNXINFRA": {
+        symbol: "NIFTYINFRA",
+        name: "NIFTY Infrastructure",
+        country: "India",
+        exchange: "NSE",
+        category: "Sectoral",
+      },
+      // ── Volatility ────────────────────────────────────
+      "^INDIAVIX": {
+        symbol: "INDIAVIX",
+        name: "India VIX",
+        country: "India",
+        exchange: "NSE",
+        category: "Volatility",
+      },
+    };
+
+    // ═══════════════════════════════════════════════════════
     // COMMODITIES
     // ═══════════════════════════════════════════════════════
     this.commodities = {
@@ -641,6 +762,86 @@ class YahooFinanceService {
       return indices;
     } catch (error) {
       console.error("❌ Error fetching global indices:", error.message);
+      throw error;
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  //  INDIAN INDICES (NSE Broad + Sectoral + GIFT India)
+  // ═══════════════════════════════════════════════════════════
+
+  /**
+   * Get all Indian market indices: NSE broad market, sectoral, BSE, and
+   * appends static GIFT India (NSE IFSC) info using NIFTY 50 as the proxy value.
+   */
+  async getIndianIndices() {
+    const cacheKey = "indian_indices";
+    const cached = cache.get(cacheKey);
+    if (cached) return cached;
+
+    try {
+      console.log("🇮🇳 Fetching Indian indices from Yahoo Finance...");
+      const yahooSymbols = Object.keys(this.indianIndices);
+      const results = await this.fetchQuotes(yahooSymbols);
+
+      const indices = results
+        .filter((r) => r.data)
+        .map((r) => {
+          const meta = this.indianIndices[r.yahooSymbol];
+          return {
+            ...this.mapQuoteToStandard(r.data, meta),
+            category: meta.category,
+          };
+        });
+
+      // Append static GIFT India / NSE IFSC section
+      // GIFT NIFTY (NSE IFSC) mirrors NIFTY 50; use live NIFTY 50 price as proxy
+      const nifty = indices.find((i) => i.symbol === "NIFTY");
+      const giftIndices = [
+        {
+          symbol: "GIFTNIFTY",
+          name: "GIFT NIFTY 50 (NSE IFSC)",
+          country: "India",
+          exchange: "NSE IFSC",
+          category: "GIFT India",
+          current_value: nifty ? nifty.current_value : 0,
+          change: nifty ? nifty.change : 0,
+          change_percent: nifty ? nifty.change_percent : 0,
+          previous_close: nifty ? nifty.previous_close : 0,
+          open: nifty ? nifty.open : 0,
+          high: nifty ? nifty.high : 0,
+          low: nifty ? nifty.low : 0,
+          volume: 0,
+          currency: "USD",
+          last_updated: new Date().toISOString(),
+          note: "GIFT NIFTY 50 Futures — NSE IFSC, GIFT City. USD-denominated. Value mirrors NIFTY 50.",
+        },
+        {
+          symbol: "GIFTBANKNIFTY",
+          name: "GIFT Bank Nifty (NSE IFSC)",
+          country: "India",
+          exchange: "NSE IFSC",
+          category: "GIFT India",
+          current_value: indices.find((i) => i.symbol === "BANKNIFTY")?.current_value ?? 0,
+          change: indices.find((i) => i.symbol === "BANKNIFTY")?.change ?? 0,
+          change_percent: indices.find((i) => i.symbol === "BANKNIFTY")?.change_percent ?? 0,
+          previous_close: indices.find((i) => i.symbol === "BANKNIFTY")?.previous_close ?? 0,
+          open: indices.find((i) => i.symbol === "BANKNIFTY")?.open ?? 0,
+          high: indices.find((i) => i.symbol === "BANKNIFTY")?.high ?? 0,
+          low: indices.find((i) => i.symbol === "BANKNIFTY")?.low ?? 0,
+          volume: 0,
+          currency: "USD",
+          last_updated: new Date().toISOString(),
+          note: "Bank Nifty Futures — NSE IFSC, GIFT City. USD-denominated.",
+        },
+      ];
+
+      const all = [...indices, ...giftIndices];
+      console.log(`✅ Fetched ${all.length} Indian indices`);
+      cache.set(cacheKey, all, 30);
+      return all;
+    } catch (error) {
+      console.error("❌ Error fetching Indian indices:", error.message);
       throw error;
     }
   }

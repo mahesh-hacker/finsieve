@@ -64,6 +64,19 @@ router.get("/region/:region", async (req, res) => {
   }
 });
 
+// ─── INDIAN INDICES (NSE broad + sectoral + GIFT India) ────
+router.get("/india", async (req, res) => {
+  try {
+    const indices = await yahooFinanceService.getIndianIndices();
+    res.json({ success: true, data: indices, count: indices.length });
+  } catch (error) {
+    console.error("❌ Indian indices error:", error.message);
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to fetch Indian indices" });
+  }
+});
+
 // ─── HISTORICAL DATA FOR AN INDEX ──────────────────────────
 router.get("/:symbol/history", async (req, res) => {
   try {

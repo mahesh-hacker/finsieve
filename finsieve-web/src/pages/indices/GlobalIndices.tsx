@@ -35,7 +35,9 @@ const REGIONS = [
 ];
 
 const COUNTRY_FLAGS: Record<string, string> = {
+  "United States": "🇺🇸",
   US: "🇺🇸",
+  "United Kingdom": "🇬🇧",
   UK: "🇬🇧",
   Germany: "🇩🇪",
   France: "🇫🇷",
@@ -53,6 +55,7 @@ const COUNTRY_FLAGS: Record<string, string> = {
   Mexico: "🇲🇽",
   Indonesia: "🇮🇩",
   Europe: "🇪🇺",
+  Global: "🌐",
 };
 
 const GlobalIndices = () => {
@@ -131,7 +134,7 @@ const GlobalIndices = () => {
     "Indonesia",
   ];
   const europeCountries = ["UK", "Germany", "France", "Spain", "Europe"];
-  const americasCountries = ["US", "Canada", "Brazil", "Mexico"];
+  const americasCountries = ["United States", "US", "Canada", "Brazil", "Mexico"];
 
   const getRegionIndices = () => {
     const region = REGIONS[activeRegion].key;
@@ -185,9 +188,10 @@ const GlobalIndices = () => {
       >
         <Box>
           <Typography
-            variant="h4"
+            variant="h5"
             sx={{
               fontWeight: 800,
+              fontSize: { xs: 18, sm: 22, md: 26 },
               display: "flex",
               alignItems: "center",
               gap: 1,

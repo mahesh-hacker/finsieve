@@ -20,6 +20,8 @@ export interface GlobalIndex {
   exchange: string;
   currency: string;
   last_updated: string;
+  category?: string;
+  note?: string;
 }
 
 export interface CurrencyRate {
@@ -45,6 +47,10 @@ export interface HistoricalDataPoint {
 class GlobalIndicesService {
   async getAllIndices() {
     return apiService.get<GlobalIndex[]>("/global-indices");
+  }
+
+  async getIndianIndices() {
+    return apiService.get<GlobalIndex[]>("/global-indices/india");
   }
 
   async getIndicesByCountry(country: string) {
