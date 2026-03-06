@@ -144,7 +144,8 @@ class MutualFundService {
           scheme_type: data.meta?.scheme_type,
           scheme_category: data.meta?.scheme_category,
         },
-        data: (data.data || []).slice(0, 365).map((entry) => ({
+        // Keep 5 years + buffer so 3Y/5Y CAGR can be computed
+        data: (data.data || []).slice(0, 1900).map((entry) => ({
           date: entry.date,
           nav: parseFloat(entry.nav),
         })),
@@ -233,12 +234,12 @@ class MutualFundService {
       }
 
       const currentNav = data[0].nav;
+      // mfapi.in returns one record per calendar day (newest first)
       const periods = {
-        "1W": 5,
-        "1M": 22,
-        "3M": 66,
-        "6M": 132,
-        "1Y": 252,
+        "1M": 30,
+        "3M": 90,
+        "6M": 180,
+        "1Y": 365,
         "3Y": 365 * 3,
         "5Y": 365 * 5,
       };

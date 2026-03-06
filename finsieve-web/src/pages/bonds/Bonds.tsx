@@ -117,10 +117,10 @@ const Bonds = () => {
               gap: 1,
             }}
           >
-            🏛️ Bonds & Treasury
+            🏛️ India Bonds & G-Sec
           </Typography>
           <Typography variant="body2" sx={{ color: "text.secondary", mt: 0.5 }}>
-            US Treasury Yields • Yield Curve Analysis
+            India Government Securities • RBI Reference Rates • Yield Curve
           </Typography>
         </Box>
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
@@ -155,8 +155,8 @@ const Bonds = () => {
             border: `1px solid ${alpha("#f59e0b", 0.3)}`,
           }}
         >
-          ⚠️ Yield Curve Inversion Detected - The 2-year yield exceeds the
-          10-year yield. Historically this signals a potential recession.
+          ⚠️ Yield Curve Inversion Detected - The 2-year G-Sec yield exceeds the
+          10-year yield. This may signal RBI rate cut expectations or growth slowdown.
           {yieldCurve.spread_2_10 !== null && (
             <Typography variant="body2" sx={{ mt: 0.5 }}>
               2s-10s Spread:{" "}
@@ -170,7 +170,7 @@ const Bonds = () => {
       {yieldCurve && yieldCurve.curve?.length > 0 && (
         <Card sx={{ mb: 4, p: 3 }}>
           <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
-            📈 US Treasury Yield Curve
+            📈 India G-Sec Yield Curve
             {yieldCurve.spread_2_10 !== null && (
               <Chip
                 label={`2s-10s Spread: ${yieldCurve.spread_2_10.toFixed(3)}%`}
@@ -245,7 +245,7 @@ const Bonds = () => {
 
       {/* Bond Cards */}
       <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
-        US Treasury Yields
+        India G-Sec Yields
       </Typography>
       <Box
         sx={{
@@ -265,11 +265,13 @@ const Bonds = () => {
           const clr = pos ? "#10b981" : "#ef4444";
           // Color code by maturity
           const matColors: Record<string, string> = {
-            "3M": "#3b82f6",
-            "2Y": "#8b5cf6",
-            "5Y": "#f59e0b",
-            "10Y": "#ef4444",
-            "30Y": "#10b981",
+            "91D":  "#3b82f6",
+            "182D": "#06b6d4",
+            "364D": "#8b5cf6",
+            "2Y":   "#a855f7",
+            "5Y":   "#f59e0b",
+            "10Y":  "#ef4444",
+            "30Y":  "#10b981",
           };
           const matClr = matColors[b.maturity] || "#6366f1";
           return (
@@ -344,7 +346,7 @@ const Bonds = () => {
         }}
       >
         <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
-          💡 Understanding the Yield Curve
+          💡 Understanding India G-Sec Yields
         </Typography>
         <Box
           sx={{
@@ -356,33 +358,32 @@ const Bonds = () => {
         >
           <Box>
             <Typography variant="body2" sx={{ fontWeight: 700, mb: 0.5 }}>
-              Normal Yield Curve
+              What are G-Secs?
             </Typography>
             <Typography variant="caption" sx={{ color: "text.secondary" }}>
-              Long-term bonds yield more than short-term. This is the healthy
-              state, indicating economic growth expectations.
-            </Typography>
-          </Box>
-          <Box>
-            <Typography
-              variant="body2"
-              sx={{ fontWeight: 700, mb: 0.5, color: "#ef4444" }}
-            >
-              Inverted Yield Curve ⚠️
-            </Typography>
-            <Typography variant="caption" sx={{ color: "text.secondary" }}>
-              Short-term bonds yield more than long-term. Historically precedes
-              recessions (inverted before every US recession since 1955).
+              Government Securities (G-Secs) are debt instruments issued by the
+              Government of India to borrow money. They are considered the safest
+              investments in India as they carry sovereign guarantee.
             </Typography>
           </Box>
           <Box>
             <Typography variant="body2" sx={{ fontWeight: 700, mb: 0.5 }}>
-              2s-10s Spread
+              RBI Repo Rate & G-Sec Link
             </Typography>
             <Typography variant="caption" sx={{ color: "text.secondary" }}>
-              The difference between 2-year and 10-year Treasury yields. When
-              negative, the curve is inverted. Watched closely by the Fed and
-              investors.
+              The RBI's repo rate (currently 6.25%) anchors short-term yields.
+              Long-term G-Sec yields reflect inflation expectations and fiscal
+              outlook. The 10-Year G-Sec is India's benchmark rate.
+            </Typography>
+          </Box>
+          <Box>
+            <Typography variant="body2" sx={{ fontWeight: 700, mb: 0.5 }}>
+              2Y–10Y Spread
+            </Typography>
+            <Typography variant="caption" sx={{ color: "text.secondary" }}>
+              The spread between 2-year and 10-year G-Sec yields signals market
+              expectations. A flat or inverted curve may indicate slowing growth
+              or RBI rate cut expectations.
             </Typography>
           </Box>
         </Box>
