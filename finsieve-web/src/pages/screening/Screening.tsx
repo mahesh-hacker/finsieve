@@ -37,7 +37,6 @@ import screeningService, {
   type AssetClassInfo,
   type QuickScreen,
 } from "../../services/screening/screeningService";
-import MultiAssetTabs from "../../components/screening/MultiAssetTabs";
 import toast from "react-hot-toast";
 
 const ASSET_CLASS_COLORS: Record<string, string> = {
@@ -387,7 +386,6 @@ const Screening = ({ defaultAssetClass }: ScreeningProps) => {
 
   return (
     <Box sx={{ pb: 4 }}>
-      <MultiAssetTabs />
       {/* Header */}
       <Box sx={{ mb: 4 }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 1 }}>

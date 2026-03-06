@@ -37,7 +37,6 @@ import {
   Public as PublicIcon,
   AccountCircle,
   Logout,
-  Settings,
   Login as LoginIcon,
   Search as SearchIcon,
   KeyboardCommandKey,
@@ -1050,18 +1049,7 @@ const MainLayout = () => {
             <ListItemIcon>
               <AccountCircle sx={{ fontSize: 18 }} />
             </ListItemIcon>
-            <Typography variant="body2">Profile</Typography>
-          </MenuItem>
-          <MenuItem
-            onClick={() => {
-              navigate("/settings");
-              handleProfileMenuClose();
-            }}
-          >
-            <ListItemIcon>
-              <Settings sx={{ fontSize: 18 }} />
-            </ListItemIcon>
-            <Typography variant="body2">Settings</Typography>
+            <Typography variant="body2">My Account</Typography>
           </MenuItem>
           <Divider />
           <MenuItem onClick={handleLogout}>

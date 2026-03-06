@@ -132,14 +132,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/settings"
-          element={
-            <ProtectedRoute>
-              <ProfileSettings />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/settings" element={<Navigate to="/profile" replace />} />
       </Route>
 
       {/* ── Catch-all: redirect to dashboard ── */}
