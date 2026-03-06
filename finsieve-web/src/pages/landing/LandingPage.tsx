@@ -1392,9 +1392,9 @@ const LandingPage = () => {
               {["Privacy", "Terms", "Disclaimer"].map((l) => (
                 <Typography
                   key={l}
-                  component="a"
-                  href="#"
-                  sx={{ fontSize: 13, color: "text.secondary", textDecoration: "none", "&:hover": { color: "text.primary" } }}
+                  component="span"
+                  title="Coming soon"
+                  sx={{ fontSize: 13, color: "text.disabled", cursor: "default" }}
                 >
                   {l}
                 </Typography>

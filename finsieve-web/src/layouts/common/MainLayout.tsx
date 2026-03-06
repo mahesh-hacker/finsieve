@@ -58,6 +58,7 @@ import {
 } from "@mui/icons-material";
 import { RootState } from "../../store";
 import { logout } from "../../store/slices/authSlice";
+import { getPlanByTier } from "../../config/plans";
 import { useThemeMode, type ThemeMode } from "../../contexts/ThemeContext";
 import GlobalSearch from "../../components/common/GlobalSearch";
 import InvestBot from "../../components/chatbot/InvestBot";
@@ -363,8 +364,14 @@ const MainLayout = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [themeAnchorEl, setThemeAnchorEl] = useState<null | HTMLElement>(null);
   const [searchOpen, setSearchOpen] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Reset scroll to top on every page navigation within the layout
+  useEffect(() => {
+    contentRef.current?.scrollTo(0, 0);
+  }, [location.pathname]);
   const dispatch = useDispatch();
   const { user, isAuthenticated } = useSelector(
     (state: RootState) => state.auth,
@@ -677,7 +684,7 @@ const MainLayout = () => {
                   lineHeight: 1.3,
                 }}
               >
-                Free Plan
+                {getPlanByTier(user?.userTier ?? "FREE").name}
               </Typography>
             </Box>
           </Box>
@@ -1151,6 +1158,7 @@ const MainLayout = () => {
         {/* Spacer for AppBar (ticker + toolbar on sm+, toolbar only on xs) */}
         <Toolbar sx={{ minHeight: { xs: "56px", sm: "88px" } }} />
         <Box
+          ref={contentRef}
           className="page-enter"
           sx={{
             p: { xs: 1.5, sm: 2, md: 3 },
