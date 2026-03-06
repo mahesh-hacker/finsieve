@@ -326,6 +326,7 @@ const EtfScreener = () => {
             const catKey = getCatKey(etf.category);
             const catColor = CAT_COLORS[catKey] ?? "#6366f1";
             const r1 = retColor(etf.return_1y);
+            const r3 = retColor(etf.return_3y);
             return (
               <Paper key={etf.symbol} elevation={0} sx={{
                 p: 2, borderRadius: 2,
@@ -366,8 +367,8 @@ const EtfScreener = () => {
                   </Box>
                   <Box>
                     <Typography sx={{ fontSize: 10, color: "text.secondary" }}>3Y Return</Typography>
-                    <Typography sx={{ fontSize: 12, fontWeight: 600, color: typeof retColor(etf.return_3y) === "object" ? (retColor(etf.return_3y) as {color:string}).color : "inherit" }}>
-                      {typeof retColor(etf.return_3y) === "object" ? (retColor(etf.return_3y) as {value:string}).value : retColor(etf.return_3y)}
+                    <Typography sx={{ fontSize: 12, fontWeight: 600, color: typeof r3 === "object" ? r3.color : "inherit" }}>
+                      {typeof r3 === "object" ? r3.value : r3}
                     </Typography>
                   </Box>
                 </Box>
