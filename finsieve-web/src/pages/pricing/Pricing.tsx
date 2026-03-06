@@ -243,14 +243,21 @@ const PlanCard = ({
 
         {/* Feature list */}
         <Box sx={{ flex: 1 }}>
-          {plan.features.map((f) => (
-            <Box key={f} sx={{ display: "flex", gap: 1, mb: 1, alignItems: "flex-start" }}>
-              <CheckCircle sx={{ fontSize: 15, color: plan.color, mt: 0.2, flexShrink: 0 }} />
-              <Typography sx={{ fontSize: 13, color: "text.secondary", lineHeight: 1.4 }}>
-                {f}
-              </Typography>
-            </Box>
-          ))}
+          {plan.features.map((f) => {
+            const isNegative = f.startsWith("No ");
+            return (
+              <Box key={f} sx={{ display: "flex", gap: 1, mb: 1, alignItems: "flex-start" }}>
+                {isNegative ? (
+                  <Cancel sx={{ fontSize: 15, color: "text.disabled", mt: 0.2, flexShrink: 0 }} />
+                ) : (
+                  <CheckCircle sx={{ fontSize: 15, color: plan.color, mt: 0.2, flexShrink: 0 }} />
+                )}
+                <Typography sx={{ fontSize: 13, color: isNegative ? "text.disabled" : "text.secondary", lineHeight: 1.4 }}>
+                  {f}
+                </Typography>
+              </Box>
+            );
+          })}
         </Box>
       </CardContent>
     </Card>

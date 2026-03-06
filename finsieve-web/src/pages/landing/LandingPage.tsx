@@ -22,6 +22,7 @@ import {
   Public,
   ArrowForward,
   CheckCircle,
+  Cancel,
   Star,
   Bolt,
 } from "@mui/icons-material";
@@ -418,27 +419,43 @@ const PricingCard = ({
 
       {/* Features list */}
       <Box display="flex" flexDirection="column" gap={1.25} mb={3} sx={{ flex: 1 }}>
-        {features.map((f) => (
-          <Box key={f} display="flex" alignItems="flex-start" gap={1.25}>
-            <CheckCircle
-              sx={{
-                fontSize: 15,
-                color: highlight ? "rgba(167,243,208,0.95)" : "#10b981",
-                mt: 0.2,
-                flexShrink: 0,
-              }}
-            />
-            <Typography
-              sx={{
-                fontSize: 13.5,
-                color: highlight ? "rgba(255,255,255,0.88)" : "text.secondary",
-                lineHeight: 1.55,
-              }}
-            >
-              {f}
-            </Typography>
-          </Box>
-        ))}
+        {features.map((f) => {
+          const isNegative = f.startsWith("No ");
+          return (
+            <Box key={f} display="flex" alignItems="flex-start" gap={1.25}>
+              {isNegative ? (
+                <Cancel
+                  sx={{
+                    fontSize: 15,
+                    color: highlight ? "rgba(255,255,255,0.3)" : "text.disabled",
+                    mt: 0.2,
+                    flexShrink: 0,
+                  }}
+                />
+              ) : (
+                <CheckCircle
+                  sx={{
+                    fontSize: 15,
+                    color: highlight ? "rgba(167,243,208,0.95)" : "#10b981",
+                    mt: 0.2,
+                    flexShrink: 0,
+                  }}
+                />
+              )}
+              <Typography
+                sx={{
+                  fontSize: 13.5,
+                  color: isNegative
+                    ? highlight ? "rgba(255,255,255,0.4)" : "text.disabled"
+                    : highlight ? "rgba(255,255,255,0.88)" : "text.secondary",
+                  lineHeight: 1.55,
+                }}
+              >
+                {f}
+              </Typography>
+            </Box>
+          );
+        })}
       </Box>
 
       {/* CTA Button */}
