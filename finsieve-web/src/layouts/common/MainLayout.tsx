@@ -54,6 +54,7 @@ import {
   BusinessCenter,
   PieChart,
   CorporateFare,
+  Sell,
 } from "@mui/icons-material";
 import { RootState } from "../../store";
 import { logout } from "../../store/slices/authSlice";
@@ -188,6 +189,12 @@ const navSections = [
         text: "Market News",
         icon: <Article sx={{ fontSize: 20 }} />,
         path: "/news",
+        requiresAuth: false,
+      },
+      {
+        text: "Pricing",
+        icon: <Sell sx={{ fontSize: 20 }} />,
+        path: "/pricing",
         requiresAuth: false,
       },
     ],

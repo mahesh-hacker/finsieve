@@ -17,6 +17,7 @@ import VerifyEmail from "./pages/auth/VerifyEmail";
 // Landing & About (no layout shell)
 import LandingPage from "./pages/landing/LandingPage";
 import AboutUs from "./pages/landing/AboutUs";
+import Pricing from "./pages/pricing/Pricing";
 
 // Main Pages
 import Dashboard from "./pages/dashboard/Dashboard";
@@ -69,6 +70,7 @@ function App() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/about" element={<AboutUs />} />
 
+
       {/* ── Auth Routes ── */}
       <Route element={<AuthLayout />}>
         <Route path="/login" element={<Login />} />
@@ -80,6 +82,7 @@ function App() {
       {/* ── App Routes (inside MainLayout shell) ── */}
       <Route element={<MainLayout />}>
         {/* Public pages */}
+        <Route path="/pricing" element={<Pricing />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/equities/indian-indices" element={<IndianIndices />} />
         <Route path="/equities/indian" element={<IndianEquities />} />

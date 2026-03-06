@@ -664,8 +664,9 @@ const AppearanceSection = () => {
 /* ─── Subscription Section ─────────────────────────────────────── */
 const SubscriptionSection = () => {
   const { user } = useSelector((state: RootState) => state.auth);
+  const navigate = useNavigate();
   const theme = useTheme();
-  const isFree = user?.userTier !== "PREMIUM";
+  const isFree = user?.userTier !== "PREMIUM" && user?.userTier !== "ENTERPRISE";
 
   return (
     <Box>
@@ -703,6 +704,7 @@ const SubscriptionSection = () => {
             {isFree ? (
               <Button
                 variant="contained"
+                onClick={() => navigate("/pricing")}
                 sx={{
                   background: "linear-gradient(135deg, #6366f1, #4f46e5)",
                   fontWeight: 700,
@@ -713,11 +715,12 @@ const SubscriptionSection = () => {
                 }}
                 startIcon={<Star />}
               >
-                Upgrade to Premium
+                View Pricing Plans
               </Button>
             ) : (
               <Button
                 variant="outlined"
+                onClick={() => navigate("/pricing")}
                 sx={{ borderColor: "rgba(255,255,255,0.4)", color: "#fff", "&:hover": { borderColor: "rgba(255,255,255,0.7)", background: "rgba(255,255,255,0.1)" } }}
               >
                 Manage Billing
